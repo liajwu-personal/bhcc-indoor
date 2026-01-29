@@ -919,9 +919,27 @@
     </style>
 </head>
 <body class="font-medium">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAW3huwWXoRSWprqUFg01pmHZJXbf_j1Z8",
+            authDomain: "bhcc-indoor.firebaseapp.com",
+            projectId: "bhcc-indoor",
+            storageBucket: "bhcc-indoor.firebasestorage.app",
+            messagingSenderId: "688957631311",
+            appId: "1:688957631311:web:e97cd58a6f30e3704d733a"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
     <div class="container">
         <header class="header">
             <h1>BHCC <span>Indoor Workouts</span></h1>
+            <div id="sync-status" style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Connecting...</div>
         </header>
 
         <nav class="nav">
@@ -1202,6 +1220,29 @@
             renderAdminIntervals();
             renderZoneConfig();
             updateNoRiderWarning();
+
+            // Listen for workout updates from Firebase (real-time sync)
+            db.collection('workouts').doc('current').onSnapshot((doc) => {
+                const statusEl = document.getElementById('sync-status');
+                if (doc.exists) {
+                    const data = doc.data();
+                    workout = data.intervals || [];
+                    tempWorkout = [...workout];
+                    localStorage.setItem('bhcc_workout', JSON.stringify(workout));
+                    renderWorkoutTable();
+                    renderAdminIntervals();
+                    statusEl.textContent = 'Synced';
+                    statusEl.style.color = 'var(--success)';
+                } else {
+                    statusEl.textContent = 'Connected (no workout yet)';
+                    statusEl.style.color = 'var(--text-secondary)';
+                }
+            }, (error) => {
+                console.log('Firebase listener error:', error);
+                const statusEl = document.getElementById('sync-status');
+                statusEl.textContent = 'Offline (using local data)';
+                statusEl.style.color = 'var(--warning)';
+            });
         });
 
         // Navigation
@@ -1453,7 +1494,18 @@
             if (tempWorkout.length === 0) { alert('Add intervals first'); return; }
             workout = [...tempWorkout];
             localStorage.setItem('bhcc_workout', JSON.stringify(workout));
-            alert('Workout saved');
+
+            // Save to Firebase for everyone
+            db.collection('workouts').doc('current').set({
+                intervals: workout,
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                alert('Workout saved and synced!');
+            }).catch((error) => {
+                console.error('Firebase save error:', error);
+                alert('Workout saved locally. Sync failed - check console.');
+            });
+
             renderWorkoutTable();
         }
 
@@ -1462,6 +1514,10 @@
                 tempWorkout = [];
                 workout = [];
                 localStorage.removeItem('bhcc_workout');
+
+                // Clear from Firebase too
+                db.collection('workouts').doc('current').delete().catch(console.error);
+
                 renderAdminIntervals();
                 renderWorkoutTable();
             }
