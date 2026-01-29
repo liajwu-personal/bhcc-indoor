@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BHCC Indoor Workouts</title>
+    <style>
+        :root {
+            --font-size-base: 18px;
+            --font-size-large: 24px;
+            --font-size-xlarge: 32px;
+            --font-size-huge: 48px;
+            --font-size-massive: 72px;
+
+            /* Modern dark palette */
+            --bg-primary: #000000;
+            --bg-secondary: #0a0a0a;
+            --bg-card: #111111;
+            --bg-elevated: #1a1a1a;
+            --bg-input: #0d0d0d;
+
+            --border-subtle: #222222;
+            --border-default: #333333;
+            --border-focus: #0066ff;
+
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-muted: #555555;
+
+            --accent: #0066ff;
+            --accent-hover: #0052cc;
+            --accent-subtle: rgba(0, 102, 255, 0.15);
+
+            --success: #00c853;
+            --danger: #ff3b30;
+            --warning: #ff9500;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Font scaling */
+        body.font-small {
+            --font-size-base: 16px;
+            --font-size-large: 20px;
+            --font-size-xlarge: 28px;
+            --font-size-huge: 40px;
+            --font-size-massive: 56px;
+        }
+        body.font-medium {
+            --font-size-base: 20px;
+            --font-size-large: 26px;
+            --font-size-xlarge: 36px;
+            --font-size-huge: 52px;
+            --font-size-massive: 76px;
+        }
+        body.font-large {
+            --font-size-base: 24px;
+            --font-size-large: 32px;
+            --font-size-xlarge: 44px;
+            --font-size-huge: 60px;
+            --font-size-massive: 88px;
+        }
+        body.font-xlarge {
+            --font-size-base: 28px;
+            --font-size-large: 38px;
+            --font-size-xlarge: 52px;
+            --font-size-huge: 68px;
+            --font-size-massive: 100px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 24px 0;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: var(--font-size-xlarge);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .header h1 span {
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 32px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 12px;
+            width: fit-content;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .nav-btn:hover {
+            color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+
+        .nav-btn.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: var(--font-size-large);
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: calc(var(--font-size-base) * 0.85);
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: var(--font-size-base);
+            font-family: inherit;
+            background: var(--bg-input);
+            border: 1px solid var(--border-default);
+            border-radius: 10px;
+            color: var(--text-primary);
+            transition: all 0.15s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-subtle);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            padding-right: 44px;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            font-family: inherit;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-default);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-subtle);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+        }
+
+        .btn-ghost:hover {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        /* Rider Selection */
+        .rider-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .rider-bar select {
+            width: auto;
+            min-width: 200px;
+            font-size: var(--font-size-large);
+            padding: 16px 48px 16px 16px;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .view-btn {
+            padding: 14px 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .view-btn:hover {
+            border-color: var(--border-focus);
+            color: var(--text-primary);
+        }
+
+        .view-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Info banner */
+        .info-banner {
+            background: var(--accent-subtle);
+            border: 1px solid var(--accent);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+        }
+
+        /* Workout Table */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-subtle);
+        }
+
+        .workout-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .workout-table th {
+            background: var(--bg-elevated);
+            padding: 16px;
+            text-align: center;
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .workout-table td {
+            padding: 18px 16px;
+            text-align: center;
+            font-size: var(--font-size-large);
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .workout-table tbody tr {
+            transition: background 0.1s ease;
+            cursor: pointer;
+        }
+
+        .workout-table tbody tr:hover {
+            background: var(--bg-elevated);
+        }
+
+        .workout-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .workout-table tr.current {
+            background: var(--accent) !important;
+        }
+
+        .workout-table tr.current td {
+            color: white;
+            font-size: var(--font-size-xlarge);
+            font-weight: 700;
+            padding: 24px 16px;
+        }
+
+        /* Ride Mode */
+        .ride-mode {
+            display: none;
+            text-align: center;
+        }
+
+        .ride-mode.active {
+            display: block;
+        }
+
+        .ride-nav {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 32px;
+        }
+
+        .ride-prev {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.15s ease;
+        }
+
+        .ride-prev:hover {
+            opacity: 0.8;
+        }
+
+        .ride-prev:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .ride-prev svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .ride-time {
+            font-size: var(--font-size-massive);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .ride-label {
+            font-size: var(--font-size-large);
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 500px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .stat-card {
+                padding: 12px;
+            }
+
+            .stat-value {
+                font-size: var(--font-size-xlarge) !important;
+            }
+
+            .stat-label, .stat-unit {
+                font-size: 10px !important;
+            }
+
+            .ride-time {
+                font-size: var(--font-size-huge);
+            }
+
+            .ride-label {
+                font-size: var(--font-size-base);
+                margin-bottom: 12px;
+            }
+
+            .next-up-card {
+                padding: 16px;
+            }
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: calc(var(--font-size-base) * 0.75);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-huge);
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-value.power { color: #ff9500; }
+        .stat-value.hr { color: #ff3b30; }
+        .stat-value.cadence { color: #30d158; }
+        .stat-value.time { color: #bf5af2; }
+
+        .stat-unit {
+            font-size: calc(var(--font-size-base) * 0.85);
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .timer-btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            color: var(--text-primary);
+        }
+
+        .timer-btn:hover {
+            background: var(--border-subtle);
+        }
+
+        .timer-btn.active {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .timer-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .next-up-card {
+            background: var(--accent);
+            border-radius: 16px;
+            padding: 24px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            border: none;
+            width: 100%;
+            text-align: center;
+        }
+
+        .next-up-card:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .next-up-card:active {
+            transform: translateY(0);
+        }
+
+        .next-up-card.disabled {
+            background: var(--bg-elevated);
+            cursor: default;
+        }
+
+        .next-up-card.disabled:hover {
+            transform: none;
+        }
+
+        .next-up-label {
+            font-size: calc(var(--font-size-base) * 0.85);
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .next-up-card.disabled .next-up-label {
+            color: var(--text-secondary);
+        }
+
+        .next-up-value {
+            font-size: var(--font-size-large);
+            font-weight: 600;
+            color: white;
+        }
+
+        .next-up-card.disabled .next-up-value {
+            color: var(--text-primary);
+        }
+
+        .next-up-hint {
+            font-size: calc(var(--font-size-base) * 0.75);
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+
+        .next-up-card.disabled .next-up-hint {
+            display: none;
+        }
+
+        /* Member list */
+        .member-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .member-name {
+            font-size: var(--font-size-large);
+            font-weight: 600;
+        }
+
+        .member-stats {
+            display: flex;
+            gap: 24px;
+            color: var(--text-secondary);
+        }
+
+        .member-stats strong {
+            color: var(--text-primary);
+        }
+
+        /* HR toggle */
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-btn {
+            padding: 10px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: calc(var(--font-size-base) * 0.9);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Admin tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: var(--bg-secondary);
+            padding: 4px;
+            border-radius: 10px;
+            width: fit-content;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-size: var(--font-size-base);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .admin-tab.active {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .admin-panel {
+            display: none;
+        }
+
+        .admin-panel.active {
+            display: block;
+        }
+
+        /* Interval entry */
+        .interval-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .interval-list {
+            margin-top: 24px;
+        }
+
+        .interval-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 12px;
+            font-size: var(--font-size-base);
+        }
+
+        .interval-item .time {
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        /* Upload area */
+        .upload-area {
+            border: 2px dashed var(--border-default);
+            border-radius: 16px;
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent);
+            background: var(--accent-subtle);
+        }
+
+        .upload-title {
+            font-size: var(--font-size-large);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .upload-subtitle {
+            color: var(--text-secondary);
+        }
+
+        #screenshot-preview {
+            max-width: 100%;
+            border-radius: 12px;
+            margin: 24px 0;
+            display: none;
+        }
+
+        .status-msg {
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin: 16px 0;
+            font-weight: 500;
+        }
+
+        .status-msg.processing {
+            background: var(--accent-subtle);
+            color: var(--accent);
+        }
+
+        .status-msg.success {
+            background: rgba(0, 200, 83, 0.15);
+            color: var(--success);
+        }
+
+        .status-msg.error {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--danger);
+        }
+
+        .paste-area {
+            margin-top: 24px;
+        }
+
+        .paste-area textarea {
+            min-height: 180px;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: calc(var(--font-size-base) * 0.9);
+        }
+
+        /* Settings */
+        .setting-group {
+            margin-bottom: 32px;
+        }
+
+        .setting-title {
+            font-size: var(--font-size-large);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .setting-desc {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            padding: 12px 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-default);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .size-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        .zone-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .zone-row {
+            display: grid;
+            grid-template-columns: 80px 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .zone-row label {
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .nav {
+                width: 100%;
+            }
+
+            .nav-btn {
+                flex: 1;
+                text-align: center;
+                padding: 12px 8px;
+            }
+
+            .rider-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .rider-bar select {
+                width: 100%;
+            }
+
+            .view-toggle {
+                width: 100%;
+            }
+
+            .view-btn {
+                flex: 1;
+            }
+
+            .zone-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
+
+        /* Landscape optimization */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .stat-value {
+                font-size: var(--font-size-huge);
+            }
+
+            .ride-time {
+                font-size: var(--font-size-huge);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border-subtle);
+            margin: 32px 0;
+        }
+    </style>
+</head>
+<body class="font-medium">
+    <div class="container">
+        <header class="header">
+            <h1>BHCC <span>Indoor Workouts</span></h1>
+        </header>
+
+        <nav class="nav">
+            <button class="nav-btn active" onclick="showSection('workout')">Workout</button>
+            <button class="nav-btn" onclick="showSection('members')">Members</button>
+            <button class="nav-btn" onclick="showSection('admin')">Admin</button>
+            <button class="nav-btn" onclick="showSection('settings')">Settings</button>
+        </nav>
+
+        <!-- WORKOUT -->
+        <section id="workout-section" class="section active">
+            <div class="rider-bar">
+                <select id="current-rider" onchange="updateWorkoutDisplay()">
+                    <option value="">Select your name</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="toggleRideMode(false)" id="btn-table">Table</button>
+                    <button class="view-btn" onclick="toggleRideMode(true)" id="btn-ride">Ride Mode</button>
+                </div>
+            </div>
+
+            <div id="no-rider-msg" class="info-banner" style="display:none;">
+                Select your name above to see personalized power and heart rate targets
+            </div>
+
+            <div id="table-view">
+                <div class="table-container">
+                    <table class="workout-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Zone</th>
+                                <th>Power</th>
+                                <th>Cadence</th>
+                                <th>HR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workout-body">
+                            <tr><td colspan="5" class="empty-state">No workout loaded yet</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="ride-mode" class="ride-mode">
+                <div class="ride-nav">
+                    <button class="ride-prev" onclick="prevInterval()" id="prev-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        Previous
+                    </button>
+                </div>
+
+                <div class="ride-time" id="ride-time">0:00</div>
+                <div class="ride-label" id="ride-label">Interval 1 of 1 — Zone 1</div>
+
+                <div class="timer-controls">
+                    <button class="timer-btn" onclick="toggleTimer()" id="timer-btn" title="Start/Pause Timer">
+                        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    </button>
+                    <button class="timer-btn" onclick="resetIntervalTimer()" title="Reset Timer">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    </button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Power</div>
+                        <div class="stat-value power" id="ride-power">---</div>
+                        <div class="stat-unit">watts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Heart Rate</div>
+                        <div class="stat-value hr" id="ride-hr">---</div>
+                        <div class="stat-unit">bpm</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Cadence</div>
+                        <div class="stat-value cadence" id="ride-cadence">---</div>
+                        <div class="stat-unit">rpm</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Interval</div>
+                        <div class="stat-value time" id="ride-duration">---</div>
+                        <div class="stat-unit">duration</div>
+                    </div>
+                </div>
+
+                <button class="next-up-card" onclick="nextInterval()" id="next-up-btn">
+                    <div class="next-up-label">Next Up</div>
+                    <div class="next-up-value" id="ride-next">---</div>
+                    <div class="next-up-hint">Tap to advance</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- MEMBERS -->
+        <section id="members-section" class="section">
+            <div class="card">
+                <div class="card-title">Add Member</div>
+
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="member-name" placeholder="Enter name">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">FTP (watts) <span style="color: var(--text-muted); text-transform: none; font-weight: 400;">— optional</span></label>
+                    <input type="number" id="member-ftp" placeholder="Leave blank if unknown">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Max Heart Rate</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" onclick="toggleHRInput('direct')" id="hr-direct-btn">Enter directly</button>
+                        <button class="toggle-btn" onclick="toggleHRInput('age')" id="hr-age-btn">Calculate from age</button>
+                    </div>
+                    <div id="hr-direct-input">
+                        <input type="number" id="member-maxhr" placeholder="e.g., 180">
+                    </div>
+                    <div id="hr-age-input" style="display:none;">
+                        <input type="number" id="member-age" placeholder="Enter age" oninput="calculateHRFromAge()">
+                        <p style="margin-top:12px; color: var(--text-secondary);">
+                            Estimated Max HR: <strong id="estimated-hr" style="color: var(--text-primary);">---</strong> bpm
+                        </p>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="addMember()">Add Member</button>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Team</div>
+                <div class="member-list" id="member-list">
+                    <div class="empty-state">No members yet</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN -->
+        <section id="admin-section" class="section">
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="showAdminPanel('manual')" id="tab-manual">Manual Entry</button>
+                <button class="admin-tab" onclick="showAdminPanel('paste')" id="tab-paste">Paste Text</button>
+            </div>
+
+            <div class="admin-panel active" id="panel-manual">
+                <div class="card">
+                    <div class="card-title">Add Interval</div>
+                    <div class="interval-grid">
+                        <div class="form-group">
+                            <label class="form-label">Duration</label>
+                            <input type="text" id="int-duration" placeholder="2:00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Zone</label>
+                            <select id="int-zone">
+                                <option value="1">Zone 1</option>
+                                <option value="2">Zone 2</option>
+                                <option value="2A">Zone 2A</option>
+                                <option value="3">Zone 3</option>
+                                <option value="4">Zone 4</option>
+                                <option value="5">Zone 5</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Cadence</label>
+                            <input type="text" id="int-cadence" placeholder="85-90">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">HR %</label>
+                            <input type="text" id="int-hr" placeholder="65%">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Repeat</label>
+                            <select id="int-repeat">
+                                <option value="1">x1</option>
+                                <option value="2">x2</option>
+                                <option value="3">x3</option>
+                                <option value="4">x4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addInterval()">Add Interval</button>
+                </div>
+            </div>
+
+            <div class="admin-panel" id="panel-paste">
+                <div class="card">
+                    <div class="card-title">Paste Workout Text</div>
+                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
+                        Paste the workout text from your email or message. Include duration and zone for each interval.
+                    </p>
+                    <div class="paste-area">
+                        <textarea id="paste-text" placeholder="Example:
+5:00 Zone 1 85-90 62.5%
+2:00 Zone 2 90-95 65%
+2:00 Zone 2A 95-100 75%
+..."></textarea>
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" onclick="parsePastedText()">Parse Workout</button>
+                        <button class="btn btn-ghost" onclick="document.getElementById('paste-text').value=''">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card">
+                <div class="card-title">Current Workout</div>
+                <div id="workout-preview">
+                    <div class="empty-state">No intervals added</div>
+                </div>
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="saveWorkout()">Save Workout</button>
+                    <button class="btn btn-danger" onclick="clearWorkout()">Clear All</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="settings-section" class="section">
+            <div class="card">
+                <div class="setting-group">
+                    <div class="setting-title">Text Size</div>
+                    <div class="setting-desc">Choose a comfortable size for viewing on handlebars</div>
+                    <div class="size-options">
+                        <button class="size-btn" onclick="setFontSize('small')">Small</button>
+                        <button class="size-btn active" onclick="setFontSize('medium')">Medium</button>
+                        <button class="size-btn" onclick="setFontSize('large')">Large</button>
+                        <button class="size-btn" onclick="setFontSize('xlarge')">Extra Large</button>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="setting-group">
+                    <div class="setting-title">Power Zones</div>
+                    <div class="setting-desc">Customize zone ranges (% of FTP)</div>
+                    <div class="zone-grid" id="zone-config"></div>
+                    <button class="btn btn-primary" onclick="saveZones()" style="margin-top: 16px;">Save Zones</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Default zones
+        const defaultZones = {
+            '1': { min: 55, max: 75 },
+            '2': { min: 75, max: 90 },
+            '2A': { min: 88, max: 94 },
+            '3': { min: 90, max: 105 },
+            '4': { min: 105, max: 120 },
+            '5': { min: 120, max: 150 }
+        };
+
+        // State
+        let members = JSON.parse(localStorage.getItem('bhcc_members') || '[]');
+        let zones = JSON.parse(localStorage.getItem('bhcc_zones')) || JSON.parse(JSON.stringify(defaultZones));
+        let workout = JSON.parse(localStorage.getItem('bhcc_workout') || '[]');
+        let tempWorkout = [...workout];
+        let currentIntervalIndex = 0;
+        let fontSize = localStorage.getItem('bhcc_fontSize') || 'medium';
+
+        // Timer state
+        let timerInterval = null;
+        let remainingSeconds = 0;
+        let timerRunning = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setFontSize(fontSize);
+            renderMembers();
+            renderRiderSelect();
+            renderWorkoutTable();
+            renderAdminIntervals();
+            renderZoneConfig();
+            updateNoRiderWarning();
+        });
+
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
+            document.getElementById(section + '-section').classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function showAdminPanel(panel) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('panel-' + panel).classList.add('active');
+            document.getElementById('tab-' + panel).classList.add('active');
+        }
+
+        // Font size
+        function setFontSize(size) {
+            fontSize = size;
+            document.body.className = 'font-' + size;
+            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+            const idx = ['small', 'medium', 'large', 'xlarge'].indexOf(size);
+            if (document.querySelectorAll('.size-btn')[idx]) {
+                document.querySelectorAll('.size-btn')[idx].classList.add('active');
+            }
+            localStorage.setItem('bhcc_fontSize', size);
+        }
+
+        // HR Input
+        function toggleHRInput(mode) {
+            document.getElementById('hr-direct-input').style.display = mode === 'direct' ? 'block' : 'none';
+            document.getElementById('hr-age-input').style.display = mode === 'age' ? 'block' : 'none';
+            document.getElementById('hr-direct-btn').classList.toggle('active', mode === 'direct');
+            document.getElementById('hr-age-btn').classList.toggle('active', mode === 'age');
+        }
+
+        function calculateHRFromAge() {
+            const age = parseInt(document.getElementById('member-age').value);
+            if (age && age > 0 && age < 120) {
+                const maxHR = 220 - age;
+                document.getElementById('estimated-hr').textContent = maxHR;
+                document.getElementById('member-maxhr').value = maxHR;
+            } else {
+                document.getElementById('estimated-hr').textContent = '---';
+            }
+        }
+
+        // Members
+        function addMember() {
+            const name = document.getElementById('member-name').value.trim();
+            const ftpVal = document.getElementById('member-ftp').value;
+            const ftp = ftpVal ? parseInt(ftpVal) : null;
+            const maxhr = parseInt(document.getElementById('member-maxhr').value);
+
+            if (!name) { alert('Please enter a name'); return; }
+            if (ftp !== null && (ftp < 50 || ftp > 500)) { alert('Please enter a valid FTP (50-500)'); return; }
+            if (!maxhr || maxhr < 100 || maxhr > 220) { alert('Please enter a valid Max HR (100-220)'); return; }
+
+            const existing = members.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
+            if (existing >= 0) {
+                members[existing] = { name, ftp, maxhr };
+            } else {
+                members.push({ name, ftp, maxhr });
+            }
+
+            localStorage.setItem('bhcc_members', JSON.stringify(members));
+            renderMembers();
+            renderRiderSelect();
+
+            document.getElementById('member-name').value = '';
+            document.getElementById('member-ftp').value = '';
+            document.getElementById('member-maxhr').value = '';
+            document.getElementById('member-age').value = '';
+            document.getElementById('estimated-hr').textContent = '---';
+        }
+
+        function deleteMember(index) {
+            if (confirm('Remove ' + members[index].name + '?')) {
+                members.splice(index, 1);
+                localStorage.setItem('bhcc_members', JSON.stringify(members));
+                renderMembers();
+                renderRiderSelect();
+            }
+        }
+
+        function renderMembers() {
+            const list = document.getElementById('member-list');
+            if (members.length === 0) {
+                list.innerHTML = '<div class="empty-state">No members yet</div>';
+                return;
+            }
+            list.innerHTML = members.map((m, i) => `
+                <div class="member-item">
+                    <div class="member-name">${m.name}</div>
+                    <div class="member-stats">
+                        <span>FTP: <strong>${m.ftp ? m.ftp + 'W' : '—'}</strong></span>
+                        <span>Max HR: <strong>${m.maxhr}</strong></span>
+                    </div>
+                    <button class="btn btn-danger" onclick="deleteMember(${i})" style="padding: 8px 16px;">Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function renderRiderSelect() {
+            const select = document.getElementById('current-rider');
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select your name</option>' +
+                members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
+            if (currentValue && members.find(m => m.name === currentValue)) {
+                select.value = currentValue;
+            }
+            updateNoRiderWarning();
+        }
+
+        function updateNoRiderWarning() {
+            const riderName = document.getElementById('current-rider').value;
+            const warning = document.getElementById('no-rider-msg');
+            warning.style.display = (!riderName && members.length > 0) ? 'block' : 'none';
+        }
+
+        // Zones
+        function renderZoneConfig() {
+            const container = document.getElementById('zone-config');
+            container.innerHTML = Object.entries(zones).map(([zone, range]) => `
+                <div class="zone-row">
+                    <label>Zone ${zone}</label>
+                    <input type="number" id="zone-${zone}-min" value="${range.min}" placeholder="Min">
+                    <input type="number" id="zone-${zone}-max" value="${range.max}" placeholder="Max">
+                </div>
+            `).join('');
+        }
+
+        function saveZones() {
+            Object.keys(zones).forEach(zone => {
+                zones[zone].min = parseInt(document.getElementById(`zone-${zone}-min`).value) || zones[zone].min;
+                zones[zone].max = parseInt(document.getElementById(`zone-${zone}-max`).value) || zones[zone].max;
+            });
+            localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            alert('Zones saved');
+            renderWorkoutTable();
+        }
+
+        // Workout Admin
+        function parseDuration(str) {
+            if (!str) return 0;
+            const parts = str.trim().split(':');
+            if (parts.length === 2) {
+                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
+            }
+            return parseInt(str) * 60 || 0;
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function addInterval() {
+            const duration = document.getElementById('int-duration').value.trim();
+            const zone = document.getElementById('int-zone').value;
+            const cadence = document.getElementById('int-cadence').value.trim();
+            const hr = document.getElementById('int-hr').value.trim();
+            const repeat = parseInt(document.getElementById('int-repeat').value);
+
+            if (!duration) { alert('Enter a duration'); return; }
+
+            tempWorkout.push({
+                duration: parseDuration(duration),
+                zone,
+                cadence: cadence || '-',
+                hrPercent: hr || '-',
+                repeat
+            });
+            renderAdminIntervals();
+
+            document.getElementById('int-duration').value = '';
+            document.getElementById('int-cadence').value = '';
+            document.getElementById('int-hr').value = '';
+            document.getElementById('int-repeat').value = '1';
+        }
+
+        function removeInterval(index) {
+            tempWorkout.splice(index, 1);
+            renderAdminIntervals();
+        }
+
+        function renderAdminIntervals() {
+            const preview = document.getElementById('workout-preview');
+            if (tempWorkout.length === 0) {
+                preview.innerHTML = '<div class="empty-state">No intervals added</div>';
+                return;
+            }
+
+            let cumulative = 0;
+            preview.innerHTML = tempWorkout.map((int, i) => {
+                const startTime = formatTime(cumulative);
+                cumulative += int.duration * (int.repeat || 1);
+                const endTime = formatTime(cumulative);
+                const repeatLabel = int.repeat > 1 ? ` <span style="color:var(--accent)">x${int.repeat}</span>` : '';
+
+                return `
+                    <div class="interval-item">
+                        <span class="time">${startTime} → ${endTime}</span>
+                        <span>Zone ${int.zone}${repeatLabel}</span>
+                        <span>Cadence: ${int.cadence}</span>
+                        <span>HR: ${int.hrPercent}</span>
+                        <button class="btn btn-ghost" onclick="removeInterval(${i})" style="padding: 6px 12px;">Remove</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function parsePastedText() {
+            const text = document.getElementById('paste-text').value;
+            const lines = text.split('\n');
+            const parsed = [];
+
+            for (const line of lines) {
+                const durationMatch = line.match(/(\d{1,2}:\d{2})/);
+                const zoneMatch = line.match(/[Zz]one\s*(\d+[Aa]?)/i) || line.match(/[Zz](\d+[Aa]?)/);
+                const cadenceMatch = line.match(/(\d{2,3}\s*[-–]\s*\d{2,3})/);
+                const hrMatch = line.match(/(\d{2,3}(?:\.\d+)?)\s*%/);
+
+                if (durationMatch && zoneMatch) {
+                    parsed.push({
+                        duration: parseDuration(durationMatch[1]),
+                        zone: zoneMatch[1].toUpperCase(),
+                        cadence: cadenceMatch ? cadenceMatch[1].replace(/\s/g, '') : '-',
+                        hrPercent: hrMatch ? hrMatch[1] + '%' : '-',
+                        repeat: 1
+                    });
+                }
+            }
+
+            if (parsed.length === 0) {
+                alert('Could not parse intervals. Make sure each line has duration (e.g., 2:00) and zone (e.g., Zone 2)');
+                return;
+            }
+
+            tempWorkout = parsed;
+            renderAdminIntervals();
+            showAdminPanel('manual');
+            alert(`Parsed ${parsed.length} intervals`);
+        }
+
+        function saveWorkout() {
+            if (tempWorkout.length === 0) { alert('Add intervals first'); return; }
+            workout = [...tempWorkout];
+            localStorage.setItem('bhcc_workout', JSON.stringify(workout));
+            alert('Workout saved');
+            renderWorkoutTable();
+        }
+
+        function clearWorkout() {
+            if (confirm('Clear all intervals?')) {
+                tempWorkout = [];
+                workout = [];
+                localStorage.removeItem('bhcc_workout');
+                renderAdminIntervals();
+                renderWorkoutTable();
+            }
+        }
+
+        // Workout Display
+        function expandWorkout() {
+            const expanded = [];
+            workout.forEach(int => {
+                const repeats = int.repeat || 1;
+                for (let i = 0; i < repeats; i++) {
+                    expanded.push({ ...int, repeat: 1 });
+                }
+            });
+            return expanded;
+        }
+
+        function calculatePower(zone, ftp) {
+            if (!ftp) return null;
+            const zoneConfig = zones[zone];
+            if (!zoneConfig) return null;
+            const minW = Math.round(ftp * zoneConfig.min / 100);
+            const maxW = Math.round(ftp * zoneConfig.max / 100);
+            return `${minW}-${maxW}`;
+        }
+
+        function calculateHR(hrPercent, maxhr) {
+            if (!hrPercent || hrPercent === '-') return '-';
+            const percent = parseFloat(hrPercent.replace('%', ''));
+            if (isNaN(percent)) return hrPercent;
+            return Math.round(maxhr * percent / 100);
+        }
+
+        function renderWorkoutTable() {
+            const tbody = document.getElementById('workout-body');
+            const riderName = document.getElementById('current-rider').value;
+            const rider = members.find(m => m.name === riderName);
+
+            updateNoRiderWarning();
+
+            if (workout.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No workout loaded yet</td></tr>';
+                return;
+            }
+
+            const expanded = expandWorkout();
+            let cumulative = 0;
+
+            tbody.innerHTML = expanded.map((int, i) => {
+                cumulative += int.duration;
+                const timeStr = formatTime(cumulative);
+                const power = rider ? calculatePower(int.zone, rider.ftp) : null;
+                const hr = rider ? calculateHR(int.hrPercent, rider.maxhr) : int.hrPercent;
+                const isCurrent = i === currentIntervalIndex;
+
+                return `
+                    <tr class="${isCurrent ? 'current' : ''}" onclick="setCurrentInterval(${i})">
+                        <td>${timeStr}</td>
+                        <td>Z${int.zone}</td>
+                        <td>${power ? power + 'W' : '—'}</td>
+                        <td>${int.cadence}</td>
+                        <td>${typeof hr === 'number' ? hr : hr}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateWorkoutDisplay() {
+            renderWorkoutTable();
+            updateRideMode();
+            updateNoRiderWarning();
+        }
+
+        function setCurrentInterval(index) {
+            currentIntervalIndex = index;
+            renderWorkoutTable();
+            updateRideMode();
+        }
+
+        // Ride Mode
+        function toggleRideMode(enabled) {
+            document.getElementById('table-view').style.display = enabled ? 'none' : 'block';
+            document.getElementById('ride-mode').classList.toggle('active', enabled);
+            document.getElementById('btn-table').classList.toggle('active', !enabled);
+            document.getElementById('btn-ride').classList.toggle('active', enabled);
+            if (enabled) {
+                // Reset timer state when entering ride mode
+                const expanded = expandWorkout();
+                if (expanded.length > 0) {
+                    remainingSeconds = expanded[currentIntervalIndex].duration;
+                }
+                updateRideMode();
+            } else {
+                // Stop timer when leaving ride mode
+                stopTimer();
+            }
+        }
+
+        function nextInterval() {
+            const expanded = expandWorkout();
+            if (currentIntervalIndex < expanded.length - 1) {
+                currentIntervalIndex++;
+                stopTimer();
+                renderWorkoutTable();
+                updateRideMode();
+            }
+            // If at end, clicking does nothing (button shows "Workout complete!")
+        }
+
+        function prevInterval() {
+            if (currentIntervalIndex > 0) {
+                currentIntervalIndex--;
+                stopTimer();
+                renderWorkoutTable();
+                updateRideMode();
+            }
+        }
+
+        // Timer functions
+        function toggleTimer() {
+            if (timerRunning) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            if (remainingSeconds <= 0) {
+                const expanded = expandWorkout();
+                if (expanded.length > 0) {
+                    remainingSeconds = expanded[currentIntervalIndex].duration;
+                }
+            }
+            if (remainingSeconds <= 0) return;
+
+            timerRunning = true;
+            document.getElementById('play-icon').style.display = 'none';
+            document.getElementById('pause-icon').style.display = 'block';
+            document.getElementById('timer-btn').classList.add('active');
+
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+
+                if (remainingSeconds <= 0) {
+                    // Auto-advance to next interval
+                    const expanded = expandWorkout();
+                    if (currentIntervalIndex < expanded.length - 1) {
+                        currentIntervalIndex++;
+                        remainingSeconds = expanded[currentIntervalIndex].duration;
+                        renderWorkoutTable();
+                        updateRideMode();
+                    } else {
+                        stopTimer();
+                        document.getElementById('ride-time').textContent = 'Done!';
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            timerRunning = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            document.getElementById('play-icon').style.display = 'block';
+            document.getElementById('pause-icon').style.display = 'none';
+            document.getElementById('timer-btn').classList.remove('active');
+        }
+
+        function resetIntervalTimer() {
+            stopTimer();
+            const expanded = expandWorkout();
+            if (expanded.length > 0 && expanded[currentIntervalIndex]) {
+                remainingSeconds = expanded[currentIntervalIndex].duration;
+                updateTimerDisplay();
+            }
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById('ride-time').textContent = formatTime(remainingSeconds);
+        }
+
+        function updateRideMode() {
+            const riderName = document.getElementById('current-rider').value;
+            const rider = members.find(m => m.name === riderName);
+            const expanded = expandWorkout();
+
+            if (expanded.length === 0) {
+                document.getElementById('ride-time').textContent = '--:--';
+                document.getElementById('ride-label').textContent = 'No workout loaded';
+                return;
+            }
+
+            const current = expanded[currentIntervalIndex];
+
+            // Initialize timer if not running
+            if (!timerRunning && remainingSeconds === 0) {
+                remainingSeconds = current.duration;
+            }
+
+            // Show countdown time (or current interval duration if timer not started)
+            document.getElementById('ride-time').textContent = formatTime(remainingSeconds || current.duration);
+            document.getElementById('ride-label').textContent = `Interval ${currentIntervalIndex + 1} of ${expanded.length} — Zone ${current.zone}`;
+
+            if (rider) {
+                const power = calculatePower(current.zone, rider.ftp);
+                document.getElementById('ride-power').textContent = power || '—';
+                const hr = calculateHR(current.hrPercent, rider.maxhr);
+                document.getElementById('ride-hr').textContent = typeof hr === 'number' ? hr : hr;
+            } else {
+                document.getElementById('ride-power').textContent = '---';
+                document.getElementById('ride-hr').textContent = '---';
+            }
+
+            document.getElementById('ride-cadence').textContent = current.cadence;
+            document.getElementById('ride-duration').textContent = formatTime(current.duration);
+
+            const nextUpBtn = document.getElementById('next-up-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            // Disable/enable prev button
+            prevBtn.disabled = currentIntervalIndex === 0;
+
+            if (currentIntervalIndex < expanded.length - 1) {
+                const next = expanded[currentIntervalIndex + 1];
+                const nextPower = rider && rider.ftp ? calculatePower(next.zone, rider.ftp) + 'W' : '';
+                document.getElementById('ride-next').textContent = `Zone ${next.zone} ${nextPower} for ${formatTime(next.duration)}`;
+                nextUpBtn.classList.remove('disabled');
+            } else {
+                document.getElementById('ride-next').textContent = 'Workout complete!';
+                nextUpBtn.classList.add('disabled');
+            }
+        }
+    </script>
+</body>
+</html>
