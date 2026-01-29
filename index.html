@@ -1593,6 +1593,12 @@
 
         function setCurrentInterval(index) {
             currentIntervalIndex = index;
+            stopTimer();
+            // Reset timer to selected interval's duration
+            const expanded = expandWorkout();
+            if (expanded.length > 0) {
+                remainingSeconds = expanded[currentIntervalIndex].duration;
+            }
             renderWorkoutTable();
             updateRideMode();
         }
@@ -1621,6 +1627,8 @@
             if (currentIntervalIndex < expanded.length - 1) {
                 currentIntervalIndex++;
                 stopTimer();
+                // Reset timer to new interval's duration
+                remainingSeconds = expanded[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
             }
@@ -1628,9 +1636,12 @@
         }
 
         function prevInterval() {
+            const expanded = expandWorkout();
             if (currentIntervalIndex > 0) {
                 currentIntervalIndex--;
                 stopTimer();
+                // Reset timer to new interval's duration
+                remainingSeconds = expanded[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
             }
