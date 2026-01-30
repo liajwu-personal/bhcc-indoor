@@ -322,7 +322,7 @@
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
                 <button class="icon-btn" onclick="openModal('settings')" title="Settings">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M1 12h4M19 12h4M4.2 19.8l2.8-2.8M17 7l2.8-2.8"/></svg>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
                 </button>
             </div>
         </header>
@@ -334,10 +334,6 @@
                 <button class="btn-ghost btn-sm" onclick="toggleProfileEdit()" id="profile-toggle">Edit</button>
             </div>
             <div class="card-body" id="profile-form">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="user-name" placeholder="Enter your name">
-                </div>
                 <div class="form-group">
                     <label class="form-label">FTP (watts) <span class="optional">— optional</span></label>
                     <input type="number" id="user-ftp" placeholder="Leave blank if unknown">
@@ -569,7 +565,6 @@ Example:
         // Profile
         function initProfile() {
             if (userProfile) {
-                document.getElementById('user-name').value = userProfile.name || '';
                 document.getElementById('user-ftp').value = userProfile.ftp || '';
                 document.getElementById('user-maxhr').value = userProfile.maxhr || '';
                 showProfileSummary();
@@ -577,16 +572,14 @@ Example:
         }
 
         function saveProfile() {
-            const name = document.getElementById('user-name').value.trim();
             const ftpVal = document.getElementById('user-ftp').value;
             const ftp = ftpVal ? parseInt(ftpVal) : null;
             const maxhr = parseInt(document.getElementById('user-maxhr').value);
 
-            if (!name) { alert('Please enter your name'); return; }
             if (ftp !== null && (ftp < 50 || ftp > 500)) { alert('FTP should be 50-500'); return; }
             if (!maxhr || maxhr < 100 || maxhr > 220) { alert('Max HR should be 100-220'); return; }
 
-            userProfile = { name, ftp, maxhr };
+            userProfile = { ftp, maxhr };
             localStorage.setItem('bhcc_profile', JSON.stringify(userProfile));
             showProfileSummary();
             renderWorkoutTable();
