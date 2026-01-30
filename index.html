@@ -403,10 +403,10 @@
                 <div class="table-container">
                     <table class="workout-table">
                         <thead>
-                            <tr><th>Time</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>
+                            <tr><th>Time</th><th>Duration</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>
                         </thead>
                         <tbody id="workout-body">
-                            <tr><td colspan="5" class="empty-state">No workout loaded yet</td></tr>
+                            <tr><td colspan="6" class="empty-state">No workout loaded yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -819,14 +819,14 @@ Example:
 
         function renderWorkoutTable() {
             const tbody = document.getElementById('workout-body');
-            if (workout.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No workout loaded</td></tr>'; return; }
+            if (workout.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout loaded</td></tr>'; return; }
             const exp = expandWorkout();
             let cum = 0;
             tbody.innerHTML = exp.map((int, i) => {
                 cum += int.duration;
                 const pwr = userProfile ? calcPower(int.zone, userProfile.ftp) : null;
                 const hr = userProfile ? calcHR(int.hrPercent, userProfile.maxhr) : int.hrPercent;
-                return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
+                return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
             }).join('');
         }
 
