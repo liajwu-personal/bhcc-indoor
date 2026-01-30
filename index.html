@@ -12,7 +12,6 @@
             --font-size-huge: 48px;
             --font-size-massive: 72px;
 
-            /* Modern dark palette */
             --bg-primary: #000000;
             --bg-secondary: #0a0a0a;
             --bg-card: #111111;
@@ -36,11 +35,7 @@
             --warning: #ff9500;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -52,870 +47,251 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Font scaling */
-        body.font-small {
-            --font-size-base: 16px;
-            --font-size-large: 20px;
-            --font-size-xlarge: 28px;
-            --font-size-huge: 40px;
-            --font-size-massive: 56px;
-        }
-        body.font-medium {
-            --font-size-base: 20px;
-            --font-size-large: 26px;
-            --font-size-xlarge: 36px;
-            --font-size-huge: 52px;
-            --font-size-massive: 76px;
-        }
-        body.font-large {
-            --font-size-base: 24px;
-            --font-size-large: 32px;
-            --font-size-xlarge: 44px;
-            --font-size-huge: 60px;
-            --font-size-massive: 88px;
-        }
-        body.font-xlarge {
-            --font-size-base: 28px;
-            --font-size-large: 38px;
-            --font-size-xlarge: 52px;
-            --font-size-huge: 68px;
-            --font-size-massive: 100px;
-        }
+        body.font-small { --font-size-base: 16px; --font-size-large: 20px; --font-size-xlarge: 28px; --font-size-huge: 40px; --font-size-massive: 56px; }
+        body.font-medium { --font-size-base: 20px; --font-size-large: 26px; --font-size-xlarge: 36px; --font-size-huge: 52px; --font-size-massive: 76px; }
+        body.font-large { --font-size-base: 24px; --font-size-large: 32px; --font-size-xlarge: 44px; --font-size-huge: 60px; --font-size-massive: 88px; }
+        body.font-xlarge { --font-size-base: 28px; --font-size-large: 38px; --font-size-xlarge: 52px; --font-size-huge: 68px; --font-size-massive: 100px; }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
 
         /* Header */
         .header {
-            padding: 24px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 0;
             border-bottom: 1px solid var(--border-subtle);
             margin-bottom: 24px;
         }
-
-        .header h1 {
-            font-size: var(--font-size-xlarge);
-            font-weight: 600;
-            letter-spacing: -0.02em;
+        .header h1 { font-size: var(--font-size-xlarge); font-weight: 600; letter-spacing: -0.02em; }
+        .header h1 span { color: var(--text-secondary); font-weight: 400; }
+        .header-right { text-align: right; }
+        .sync-status { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+        .header-actions { display: flex; gap: 8px; }
+        .icon-btn {
+            background: none; border: none; color: var(--text-secondary); cursor: pointer;
+            padding: 8px; border-radius: 8px; transition: all 0.15s;
         }
-
-        .header h1 span {
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        /* Navigation */
-        .nav {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 32px;
-            background: var(--bg-secondary);
-            padding: 4px;
-            border-radius: 12px;
-            width: fit-content;
-        }
-
-        .nav-btn {
-            padding: 12px 24px;
-            background: transparent;
-            border: none;
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: var(--font-size-base);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .nav-btn:hover {
-            color: var(--text-primary);
-            background: var(--bg-elevated);
-        }
-
-        .nav-btn.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        /* Sections */
-        .section {
-            display: none;
-        }
-
-        .section.active {
-            display: block;
-        }
+        .icon-btn:hover { background: var(--bg-elevated); color: var(--text-primary); }
+        .icon-btn svg { width: 20px; height: 20px; display: block; }
 
         /* Cards */
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
             border-radius: 16px;
-            padding: 24px;
-            margin-bottom: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
         }
-
-        .card-title {
-            font-size: var(--font-size-large);
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-primary);
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
+        .card-title { font-size: var(--font-size-large); font-weight: 600; }
+        .card.collapsed .card-body { display: none; }
+        .card.collapsed .card-header { margin-bottom: 0; }
 
         /* Forms */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
+        .form-group { margin-bottom: 16px; }
         .form-label {
-            display: block;
-            font-size: calc(var(--font-size-base) * 0.85);
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            display: block; font-size: 13px; font-weight: 500;
+            color: var(--text-secondary); margin-bottom: 6px;
+            text-transform: uppercase; letter-spacing: 0.05em;
         }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: var(--font-size-base);
-            font-family: inherit;
-            background: var(--bg-input);
-            border: 1px solid var(--border-default);
-            border-radius: 10px;
-            color: var(--text-primary);
-            transition: all 0.15s ease;
-            -webkit-appearance: none;
-            appearance: none;
+        .form-label .optional { color: var(--text-muted); text-transform: none; font-weight: 400; }
+        input, select {
+            width: 100%; padding: 12px 14px; font-size: var(--font-size-base);
+            font-family: inherit; background: var(--bg-input);
+            border: 1px solid var(--border-default); border-radius: 10px;
+            color: var(--text-primary); transition: all 0.15s;
+            -webkit-appearance: none; appearance: none;
         }
-
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent);
+        input:focus, select:focus {
+            outline: none; border-color: var(--accent);
             box-shadow: 0 0 0 3px var(--accent-subtle);
         }
-
-        input::placeholder, textarea::placeholder {
-            color: var(--text-muted);
-        }
-
         select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
-            padding-right: 44px;
-            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            background-size: 18px; padding-right: 40px; cursor: pointer;
         }
 
         /* Buttons */
         .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 14px 24px;
-            font-size: var(--font-size-base);
-            font-weight: 600;
-            font-family: inherit;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 12px 20px; font-size: var(--font-size-base); font-weight: 600;
+            font-family: inherit; border: none; border-radius: 10px; cursor: pointer;
+            transition: all 0.15s;
         }
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border-default); }
+        .btn-ghost { background: transparent; color: var(--text-secondary); padding: 8px 12px; }
+        .btn-ghost:hover { color: var(--text-primary); }
+        .btn-sm { padding: 8px 14px; font-size: 14px; }
 
-        .btn-primary {
-            background: var(--accent);
-            color: white;
+        /* Toggle buttons */
+        .toggle-group { display: flex; gap: 6px; margin-bottom: 12px; }
+        .toggle-btn {
+            padding: 8px 14px; background: var(--bg-elevated);
+            border: 1px solid var(--border-default); border-radius: 8px;
+            color: var(--text-secondary); font-size: 14px; cursor: pointer;
         }
+        .toggle-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 
-        .btn-primary:hover {
-            background: var(--accent-hover);
+        /* Profile summary */
+        .profile-summary {
+            display: flex; justify-content: space-between; align-items: center;
         }
+        .profile-info { display: flex; gap: 20px; }
+        .profile-stat { color: var(--text-secondary); }
+        .profile-stat strong { color: var(--text-primary); }
 
-        .btn-secondary {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-            border: 1px solid var(--border-default);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border-subtle);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            opacity: 0.9;
-        }
-
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-secondary);
-        }
-
-        .btn-ghost:hover {
-            background: var(--bg-elevated);
-            color: var(--text-primary);
-        }
-
-        /* Rider Selection */
-        .rider-bar {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .rider-bar select {
-            width: auto;
-            min-width: 200px;
-            font-size: var(--font-size-large);
-            padding: 16px 48px 16px 16px;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 8px;
-        }
-
+        /* View toggle */
+        .view-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
         .view-btn {
-            padding: 14px 20px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-radius: 10px;
-            color: var(--text-secondary);
-            font-size: var(--font-size-base);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            flex: 1; padding: 12px; background: var(--bg-elevated);
+            border: 1px solid var(--border-default); border-radius: 10px;
+            color: var(--text-secondary); font-size: var(--font-size-base);
+            font-weight: 500; cursor: pointer; text-align: center;
         }
-
-        .view-btn:hover {
-            border-color: var(--border-focus);
-            color: var(--text-primary);
-        }
-
-        .view-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        /* Info banner */
-        .info-banner {
-            background: var(--accent-subtle);
-            border: 1px solid var(--accent);
-            border-radius: 10px;
-            padding: 14px 18px;
-            margin-bottom: 24px;
-            color: var(--text-primary);
-            font-size: var(--font-size-base);
-        }
+        .view-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
 
         /* Workout Table */
-        .table-container {
-            overflow-x: auto;
-            border-radius: 12px;
-            border: 1px solid var(--border-subtle);
-        }
-
-        .workout-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
+        .table-container { border-radius: 12px; border: 1px solid var(--border-subtle); overflow: hidden; }
+        .workout-table { width: 100%; border-collapse: collapse; }
         .workout-table th {
-            background: var(--bg-elevated);
-            padding: 16px;
-            text-align: center;
-            font-size: var(--font-size-base);
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 1px solid var(--border-subtle);
+            background: var(--bg-elevated); padding: 14px 12px; text-align: center;
+            font-size: 12px; font-weight: 600; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em;
         }
-
         .workout-table td {
-            padding: 18px 16px;
-            text-align: center;
-            font-size: var(--font-size-large);
-            font-weight: 500;
+            padding: 14px 12px; text-align: center;
+            font-size: var(--font-size-large); font-weight: 500;
             border-bottom: 1px solid var(--border-subtle);
         }
-
-        .workout-table tbody tr {
-            transition: background 0.1s ease;
-            cursor: pointer;
-        }
-
-        .workout-table tbody tr:hover {
-            background: var(--bg-elevated);
-        }
-
-        .workout-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .workout-table tr.current {
-            background: var(--accent) !important;
-        }
-
-        .workout-table tr.current td {
-            color: white;
-            font-size: var(--font-size-xlarge);
-            font-weight: 700;
-            padding: 24px 16px;
-        }
+        .workout-table tbody tr { cursor: pointer; transition: background 0.1s; }
+        .workout-table tbody tr:hover { background: var(--bg-elevated); }
+        .workout-table tbody tr:last-child td { border-bottom: none; }
+        .workout-table tr.current { background: var(--accent) !important; }
+        .workout-table tr.current td { color: white; font-weight: 700; }
 
         /* Ride Mode */
-        .ride-mode {
-            display: none;
-            text-align: center;
-        }
-
-        .ride-mode.active {
-            display: block;
-        }
-
-        .ride-nav {
-            display: flex;
-            justify-content: flex-start;
-            margin-bottom: 32px;
-        }
-
+        .ride-mode { display: none; text-align: center; }
+        .ride-mode.active { display: block; }
+        .ride-nav { display: flex; justify-content: flex-start; margin-bottom: 24px; }
         .ride-prev {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: var(--font-size-base);
-            cursor: pointer;
-            padding: 8px 16px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: opacity 0.15s ease;
+            background: transparent; border: none; color: var(--text-primary);
+            font-size: var(--font-size-base); cursor: pointer; padding: 8px 12px;
+            display: flex; align-items: center; gap: 6px;
         }
-
-        .ride-prev:hover {
-            opacity: 0.8;
-        }
-
-        .ride-prev:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-        }
-
-        .ride-prev svg {
-            width: 20px;
-            height: 20px;
-        }
-
+        .ride-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+        .ride-prev svg { width: 20px; height: 20px; }
         .ride-time {
-            font-size: var(--font-size-massive);
-            font-weight: 700;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
-            margin-bottom: 4px;
-            font-variant-numeric: tabular-nums;
+            font-size: var(--font-size-massive); font-weight: 700;
+            letter-spacing: -0.02em; margin-bottom: 4px; font-variant-numeric: tabular-nums;
         }
-
-        .ride-label {
-            font-size: var(--font-size-large);
-            color: var(--text-secondary);
-            margin-bottom: 16px;
+        .ride-label { font-size: var(--font-size-large); color: var(--text-secondary); margin-bottom: 16px; }
+        .timer-controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 16px; }
+        .timer-btn {
+            background: var(--bg-elevated); border: 1px solid var(--border-default);
+            border-radius: 50%; width: 48px; height: 48px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-primary);
         }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        @media (max-width: 500px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-            }
-
-            .stat-card {
-                padding: 12px;
-            }
-
-            .stat-value {
-                font-size: var(--font-size-xlarge) !important;
-            }
-
-            .stat-label, .stat-unit {
-                font-size: 10px !important;
-            }
-
-            .ride-time {
-                font-size: var(--font-size-huge);
-            }
-
-            .ride-label {
-                font-size: var(--font-size-base);
-                margin-bottom: 12px;
-            }
-
-            .next-up-card {
-                padding: 16px;
-            }
-        }
-
-        .stat-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 16px;
-        }
-
-        .stat-label {
-            font-size: calc(var(--font-size-base) * 0.75);
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 4px;
-        }
-
-        .stat-value {
-            font-size: var(--font-size-huge);
-            font-weight: 700;
-            line-height: 1;
-        }
-
+        .timer-btn.active { background: var(--success); border-color: var(--success); }
+        .timer-btn svg { width: 20px; height: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 14px; }
+        .stat-label { font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+        .stat-value { font-size: var(--font-size-huge); font-weight: 700; line-height: 1; }
         .stat-value.power { color: #ff9500; }
         .stat-value.hr { color: #ff3b30; }
         .stat-value.cadence { color: #30d158; }
         .stat-value.time { color: #bf5af2; }
-
-        .stat-unit {
-            font-size: calc(var(--font-size-base) * 0.85);
-            color: var(--text-muted);
-            margin-top: 2px;
-        }
-
-        .timer-controls {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .timer-btn {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            color: var(--text-primary);
-        }
-
-        .timer-btn:hover {
-            background: var(--border-subtle);
-        }
-
-        .timer-btn.active {
-            background: var(--success);
-            border-color: var(--success);
-        }
-
-        .timer-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
+        .stat-unit { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
         .next-up-card {
-            background: var(--accent);
-            border-radius: 16px;
-            padding: 24px;
-            cursor: pointer;
-            transition: all 0.15s ease;
-            border: none;
-            width: 100%;
-            text-align: center;
+            background: var(--accent); border-radius: 14px; padding: 20px;
+            cursor: pointer; border: none; width: 100%; text-align: center;
+        }
+        .next-up-card:hover { background: var(--accent-hover); }
+        .next-up-card.disabled { background: var(--bg-elevated); cursor: default; }
+        .next-up-label { font-size: 11px; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+        .next-up-card.disabled .next-up-label { color: var(--text-secondary); }
+        .next-up-value { font-size: var(--font-size-large); font-weight: 600; color: white; }
+        .next-up-card.disabled .next-up-value { color: var(--text-primary); }
+        .next-up-hint { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 6px; }
+        .next-up-card.disabled .next-up-hint { display: none; }
+
+        @media (max-width: 500px) {
+            .stat-card { padding: 10px; }
+            .stat-value { font-size: var(--font-size-xlarge) !important; }
+            .stat-label, .stat-unit { font-size: 9px !important; }
+            .ride-time { font-size: var(--font-size-huge); }
+            .ride-label { font-size: var(--font-size-base); }
+            .next-up-card { padding: 16px; }
         }
 
-        .next-up-card:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
+        /* Modal */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center;
         }
-
-        .next-up-card:active {
-            transform: translateY(0);
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-card); border-radius: 16px; padding: 24px;
+            width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto;
         }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-title { font-size: var(--font-size-large); font-weight: 600; }
+        .modal-close { background: none; border: none; color: var(--text-secondary); cursor: pointer; padding: 4px; }
 
-        .next-up-card.disabled {
-            background: var(--bg-elevated);
-            cursor: default;
-        }
-
-        .next-up-card.disabled:hover {
-            transform: none;
-        }
-
-        .next-up-label {
-            font-size: calc(var(--font-size-base) * 0.85);
-            color: rgba(255,255,255,0.7);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 8px;
-        }
-
-        .next-up-card.disabled .next-up-label {
-            color: var(--text-secondary);
-        }
-
-        .next-up-value {
-            font-size: var(--font-size-large);
-            font-weight: 600;
-            color: white;
-        }
-
-        .next-up-card.disabled .next-up-value {
-            color: var(--text-primary);
-        }
-
-        .next-up-hint {
-            font-size: calc(var(--font-size-base) * 0.75);
-            color: rgba(255,255,255,0.5);
-            margin-top: 8px;
-        }
-
-        .next-up-card.disabled .next-up-hint {
-            display: none;
-        }
-
-        /* Member list */
-        .member-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .member-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 20px;
-            background: var(--bg-elevated);
-            border-radius: 12px;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-
-        .member-name {
-            font-size: var(--font-size-large);
-            font-weight: 600;
-        }
-
-        .member-stats {
-            display: flex;
-            gap: 24px;
-            color: var(--text-secondary);
-        }
-
-        .member-stats strong {
-            color: var(--text-primary);
-        }
-
-        /* HR toggle */
-        .toggle-group {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .toggle-btn {
-            padding: 10px 16px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-size: calc(var(--font-size-base) * 0.9);
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .toggle-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        /* Admin tabs */
-        .admin-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 24px;
-            background: var(--bg-secondary);
-            padding: 4px;
-            border-radius: 10px;
-            width: fit-content;
-        }
-
+        /* Admin */
+        .admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--bg-secondary); padding: 4px; border-radius: 10px; }
         .admin-tab {
-            padding: 10px 20px;
-            background: transparent;
-            border: none;
-            border-radius: 6px;
-            color: var(--text-secondary);
-            font-size: var(--font-size-base);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            flex: 1; padding: 10px; background: transparent; border: none; border-radius: 6px;
+            color: var(--text-secondary); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center;
         }
-
-        .admin-tab.active {
-            background: var(--bg-card);
-            color: var(--text-primary);
-        }
-
-        .admin-panel {
-            display: none;
-        }
-
-        .admin-panel.active {
-            display: block;
-        }
-
-        /* Interval entry */
-        .interval-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .interval-list {
-            margin-top: 24px;
-        }
-
+        .admin-tab.active { background: var(--bg-card); color: var(--text-primary); }
+        .admin-panel { display: none; }
+        .admin-panel.active { display: block; }
+        .interval-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
         .interval-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: var(--bg-elevated);
-            border-radius: 10px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: var(--font-size-base);
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+            padding: 12px; background: var(--bg-elevated); border-radius: 10px; margin-bottom: 8px; font-size: 14px;
         }
-
-        .interval-item .time {
-            font-weight: 600;
-            color: var(--accent);
-        }
-
-        /* Upload area */
-        .upload-area {
-            border: 2px dashed var(--border-default);
-            border-radius: 16px;
-            padding: 48px 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.15s ease;
-        }
-
-        .upload-area:hover {
-            border-color: var(--accent);
-            background: var(--accent-subtle);
-        }
-
-        .upload-title {
-            font-size: var(--font-size-large);
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .upload-subtitle {
-            color: var(--text-secondary);
-        }
-
-        #screenshot-preview {
-            max-width: 100%;
-            border-radius: 12px;
-            margin: 24px 0;
-            display: none;
-        }
-
-        .status-msg {
-            padding: 14px 18px;
-            border-radius: 10px;
-            margin: 16px 0;
-            font-weight: 500;
-        }
-
-        .status-msg.processing {
-            background: var(--accent-subtle);
-            color: var(--accent);
-        }
-
-        .status-msg.success {
-            background: rgba(0, 200, 83, 0.15);
-            color: var(--success);
-        }
-
-        .status-msg.error {
-            background: rgba(255, 59, 48, 0.15);
-            color: var(--danger);
-        }
-
-        .paste-area {
-            margin-top: 24px;
-        }
-
-        .paste-area textarea {
-            min-height: 180px;
-            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
-            font-size: calc(var(--font-size-base) * 0.9);
+        .interval-item .time { font-weight: 600; color: var(--accent); }
+        textarea {
+            width: 100%; min-height: 150px; padding: 12px; font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px; background: var(--bg-input); border: 1px solid var(--border-default);
+            border-radius: 10px; color: var(--text-primary); resize: vertical;
         }
 
         /* Settings */
-        .setting-group {
-            margin-bottom: 32px;
-        }
-
-        .setting-title {
-            font-size: var(--font-size-large);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .setting-desc {
-            color: var(--text-secondary);
-            margin-bottom: 16px;
-        }
-
-        .size-options {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
+        .setting-group { margin-bottom: 24px; }
+        .setting-title { font-size: var(--font-size-base); font-weight: 600; margin-bottom: 6px; }
+        .setting-desc { color: var(--text-secondary); font-size: 14px; margin-bottom: 12px; }
+        .size-options { display: flex; gap: 8px; flex-wrap: wrap; }
         .size-btn {
-            padding: 12px 20px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-default);
-            border-radius: 8px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.15s ease;
+            padding: 10px 16px; background: var(--bg-elevated); border: 1px solid var(--border-default);
+            border-radius: 8px; color: var(--text-secondary); font-weight: 500; cursor: pointer;
         }
+        .size-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+        .zone-grid { display: flex; flex-direction: column; gap: 10px; }
+        .zone-row { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 10px; align-items: center; }
+        .zone-row label { font-weight: 500; color: var(--text-secondary); font-size: 14px; }
+        .zone-row input { padding: 10px; font-size: 14px; }
 
-        .size-btn.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
+        /* Footer */
+        .footer { padding: 24px 0; text-align: center; border-top: 1px solid var(--border-subtle); margin-top: 32px; }
+        .footer-link { color: var(--text-muted); font-size: 14px; cursor: pointer; background: none; border: none; }
+        .footer-link:hover { color: var(--text-secondary); }
 
-        .zone-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .zone-row {
-            display: grid;
-            grid-template-columns: 80px 1fr 1fr;
-            gap: 12px;
-            align-items: center;
-        }
-
-        .zone-row label {
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
-            .nav {
-                width: 100%;
-            }
-
-            .nav-btn {
-                flex: 1;
-                text-align: center;
-                padding: 12px 8px;
-            }
-
-            .rider-bar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .rider-bar select {
-                width: 100%;
-            }
-
-            .view-toggle {
-                width: 100%;
-            }
-
-            .view-btn {
-                flex: 1;
-            }
-
-            .zone-row {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-        }
-
-        /* Landscape optimization */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .stats-grid {
-                grid-template-columns: repeat(4, 1fr);
-            }
-
-            .stat-value {
-                font-size: var(--font-size-huge);
-            }
-
-            .ride-time {
-                font-size: var(--font-size-huge);
-            }
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 48px 24px;
-            color: var(--text-secondary);
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-        }
-
-        .divider {
-            height: 1px;
-            background: var(--border-subtle);
-            margin: 32px 0;
-        }
+        .empty-state { text-align: center; padding: 32px; color: var(--text-secondary); }
+        .divider { height: 1px; background: var(--border-subtle); margin: 20px 0; }
+        .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
     </style>
 </head>
 <body class="font-medium">
@@ -923,7 +299,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAW3huwWXoRSWprqUFg01pmHZJXbf_j1Z8",
             authDomain: "bhcc-indoor.firebaseapp.com",
@@ -932,50 +307,79 @@
             messagingSenderId: "688957631311",
             appId: "1:688957631311:web:e97cd58a6f30e3704d733a"
         };
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
     </script>
+
     <div class="container">
         <header class="header">
-            <h1>BHCC <span>Indoor Workouts</span></h1>
-            <div id="sync-status" style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">Connecting...</div>
+            <div>
+                <h1>BHCC <span>Indoor</span></h1>
+                <div class="sync-status" id="sync-status">Connecting...</div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="location.reload()" title="Refresh">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                </button>
+                <button class="icon-btn" onclick="openModal('settings')" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M1 12h4M19 12h4M4.2 19.8l2.8-2.8M17 7l2.8-2.8"/></svg>
+                </button>
+            </div>
         </header>
 
-        <nav class="nav">
-            <button class="nav-btn active" onclick="showSection('workout')">Workout</button>
-            <button class="nav-btn" onclick="showSection('members')">Members</button>
-            <button class="nav-btn" onclick="showSection('admin')">Admin</button>
-            <button class="nav-btn" onclick="showSection('settings')">Settings</button>
-        </nav>
-
-        <!-- WORKOUT -->
-        <section id="workout-section" class="section active">
-            <div class="rider-bar">
-                <select id="current-rider" onchange="updateWorkoutDisplay()">
-                    <option value="">Select your name</option>
-                </select>
-                <div class="view-toggle">
-                    <button class="view-btn active" onclick="toggleRideMode(false)" id="btn-table">Table</button>
-                    <button class="view-btn" onclick="toggleRideMode(true)" id="btn-ride">Ride Mode</button>
+        <!-- YOUR PROFILE -->
+        <div class="card" id="profile-card">
+            <div class="card-header">
+                <div class="card-title">Your Profile</div>
+                <button class="btn-ghost btn-sm" onclick="toggleProfileEdit()" id="profile-toggle">Edit</button>
+            </div>
+            <div class="card-body" id="profile-form">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" id="user-name" placeholder="Enter your name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">FTP (watts) <span class="optional">— optional</span></label>
+                    <input type="number" id="user-ftp" placeholder="Leave blank if unknown">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Heart Rate</label>
+                    <div class="toggle-group">
+                        <button class="toggle-btn active" onclick="toggleHRInput('direct')" id="hr-direct-btn">Enter directly</button>
+                        <button class="toggle-btn" onclick="toggleHRInput('age')" id="hr-age-btn">From age</button>
+                    </div>
+                    <div id="hr-direct-input">
+                        <input type="number" id="user-maxhr" placeholder="e.g., 180">
+                    </div>
+                    <div id="hr-age-input" style="display:none;">
+                        <input type="number" id="user-age" placeholder="Enter age" oninput="calculateHRFromAge()">
+                        <p style="margin-top:8px; color: var(--text-secondary); font-size: 14px;">
+                            Estimated Max HR: <strong id="estimated-hr" style="color: var(--text-primary);">---</strong> bpm
+                        </p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
+            </div>
+            <div class="card-body profile-summary" id="profile-summary" style="display:none;">
+                <div class="profile-info">
+                    <span class="profile-stat">FTP: <strong id="display-ftp">—</strong></span>
+                    <span class="profile-stat">Max HR: <strong id="display-maxhr">—</strong></span>
                 </div>
             </div>
+        </div>
 
-            <div id="no-rider-msg" class="info-banner" style="display:none;">
-                Select your name above to see personalized power and heart rate targets
+        <!-- WORKOUT -->
+        <div id="workout-section">
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setView('table')" id="btn-table">Table</button>
+                <button class="view-btn" onclick="setView('ride')" id="btn-ride">Ride Mode</button>
             </div>
 
             <div id="table-view">
                 <div class="table-container">
                     <table class="workout-table">
                         <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Zone</th>
-                                <th>Power</th>
-                                <th>Cadence</th>
-                                <th>HR</th>
-                            </tr>
+                            <tr><th>Time</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>
                         </thead>
                         <tbody id="workout-body">
                             <tr><td colspan="5" class="empty-state">No workout loaded yet</td></tr>
@@ -987,241 +391,155 @@
             <div id="ride-mode" class="ride-mode">
                 <div class="ride-nav">
                     <button class="ride-prev" onclick="prevInterval()" id="prev-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                         Previous
                     </button>
                 </div>
-
                 <div class="ride-time" id="ride-time">0:00</div>
-                <div class="ride-label" id="ride-label">Interval 1 of 1 — Zone 1</div>
-
+                <div class="ride-label" id="ride-label">Interval 1 of 1</div>
                 <div class="timer-controls">
-                    <button class="timer-btn" onclick="toggleTimer()" id="timer-btn" title="Start/Pause Timer">
-                        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+                    <button class="timer-btn" onclick="toggleTimer()" id="timer-btn">
+                        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
+                        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                     </button>
-                    <button class="timer-btn" onclick="resetIntervalTimer()" title="Reset Timer">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                    <button class="timer-btn" onclick="resetIntervalTimer()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
                 </div>
-
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Power</div>
-                        <div class="stat-value power" id="ride-power">---</div>
-                        <div class="stat-unit">watts</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Heart Rate</div>
-                        <div class="stat-value hr" id="ride-hr">---</div>
-                        <div class="stat-unit">bpm</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Cadence</div>
-                        <div class="stat-value cadence" id="ride-cadence">---</div>
-                        <div class="stat-unit">rpm</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Interval</div>
-                        <div class="stat-value time" id="ride-duration">---</div>
-                        <div class="stat-unit">duration</div>
-                    </div>
+                    <div class="stat-card"><div class="stat-label">Power</div><div class="stat-value power" id="ride-power">---</div><div class="stat-unit">watts</div></div>
+                    <div class="stat-card"><div class="stat-label">Heart Rate</div><div class="stat-value hr" id="ride-hr">---</div><div class="stat-unit">bpm</div></div>
+                    <div class="stat-card"><div class="stat-label">Cadence</div><div class="stat-value cadence" id="ride-cadence">---</div><div class="stat-unit">rpm</div></div>
+                    <div class="stat-card"><div class="stat-label">Interval</div><div class="stat-value time" id="ride-duration">---</div><div class="stat-unit">duration</div></div>
                 </div>
-
                 <button class="next-up-card" onclick="nextInterval()" id="next-up-btn">
                     <div class="next-up-label">Next Up</div>
                     <div class="next-up-value" id="ride-next">---</div>
                     <div class="next-up-hint">Tap to advance</div>
                 </button>
             </div>
-        </section>
+        </div>
 
-        <!-- MEMBERS -->
-        <section id="members-section" class="section">
-            <div class="card">
-                <div class="card-title">Add Member</div>
+        <footer class="footer">
+            <button class="footer-link" onclick="promptAdmin()">Admin</button>
+        </footer>
+    </div>
 
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" id="member-name" placeholder="Enter name">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">FTP (watts) <span style="color: var(--text-muted); text-transform: none; font-weight: 400;">— optional</span></label>
-                    <input type="number" id="member-ftp" placeholder="Leave blank if unknown">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Max Heart Rate</label>
-                    <div class="toggle-group">
-                        <button class="toggle-btn active" onclick="toggleHRInput('direct')" id="hr-direct-btn">Enter directly</button>
-                        <button class="toggle-btn" onclick="toggleHRInput('age')" id="hr-age-btn">Calculate from age</button>
-                    </div>
-                    <div id="hr-direct-input">
-                        <input type="number" id="member-maxhr" placeholder="e.g., 180">
-                    </div>
-                    <div id="hr-age-input" style="display:none;">
-                        <input type="number" id="member-age" placeholder="Enter age" oninput="calculateHRFromAge()">
-                        <p style="margin-top:12px; color: var(--text-secondary);">
-                            Estimated Max HR: <strong id="estimated-hr" style="color: var(--text-primary);">---</strong> bpm
-                        </p>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" onclick="addMember()">Add Member</button>
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="modal-settings">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Settings</div>
+                <button class="modal-close" onclick="closeModal('settings')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
             </div>
-
-            <div class="card">
-                <div class="card-title">Team</div>
-                <div class="member-list" id="member-list">
-                    <div class="empty-state">No members yet</div>
+            <div class="setting-group">
+                <div class="setting-title">Text Size</div>
+                <div class="setting-desc">Choose a comfortable size for your screen</div>
+                <div class="size-options">
+                    <button class="size-btn" onclick="setFontSize('small')">Small</button>
+                    <button class="size-btn active" onclick="setFontSize('medium')">Medium</button>
+                    <button class="size-btn" onclick="setFontSize('large')">Large</button>
+                    <button class="size-btn" onclick="setFontSize('xlarge')">XL</button>
                 </div>
             </div>
-        </section>
+            <div class="divider"></div>
+            <div class="setting-group">
+                <div class="setting-title">Power Zones</div>
+                <div class="setting-desc">Customize zone ranges (% of FTP)</div>
+                <div class="zone-grid" id="zone-config"></div>
+                <button class="btn btn-primary btn-sm" onclick="saveZones()" style="margin-top: 12px;">Save Zones</button>
+            </div>
+        </div>
+    </div>
 
-        <!-- ADMIN -->
-        <section id="admin-section" class="section">
+    <!-- Admin Modal -->
+    <div class="modal-overlay" id="modal-admin">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">Admin</div>
+                <button class="modal-close" onclick="closeModal('admin')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
             <div class="admin-tabs">
-                <button class="admin-tab active" onclick="showAdminPanel('manual')" id="tab-manual">Manual Entry</button>
+                <button class="admin-tab active" onclick="showAdminPanel('manual')" id="tab-manual">Manual</button>
                 <button class="admin-tab" onclick="showAdminPanel('paste')" id="tab-paste">Paste Text</button>
             </div>
-
             <div class="admin-panel active" id="panel-manual">
-                <div class="card">
-                    <div class="card-title">Add Interval</div>
-                    <div class="interval-grid">
-                        <div class="form-group">
-                            <label class="form-label">Duration</label>
-                            <input type="text" id="int-duration" placeholder="2:00">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Zone</label>
-                            <select id="int-zone">
-                                <option value="1">Zone 1</option>
-                                <option value="2">Zone 2</option>
-                                <option value="2A">Zone 2A</option>
-                                <option value="3">Zone 3</option>
-                                <option value="4">Zone 4</option>
-                                <option value="5">Zone 5</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Cadence</label>
-                            <input type="text" id="int-cadence" placeholder="85-90">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">HR %</label>
-                            <input type="text" id="int-hr" placeholder="65%">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Repeat</label>
-                            <select id="int-repeat">
-                                <option value="1">x1</option>
-                                <option value="2">x2</option>
-                                <option value="3">x3</option>
-                                <option value="4">x4</option>
-                            </select>
-                        </div>
+                <div class="interval-grid">
+                    <div class="form-group">
+                        <label class="form-label">Duration</label>
+                        <input type="text" id="int-duration" placeholder="2:00">
                     </div>
-                    <button class="btn btn-primary" onclick="addInterval()">Add Interval</button>
+                    <div class="form-group">
+                        <label class="form-label">Zone</label>
+                        <select id="int-zone">
+                            <option value="1">Zone 1</option>
+                            <option value="2">Zone 2</option>
+                            <option value="2A">Zone 2A</option>
+                            <option value="3">Zone 3</option>
+                            <option value="4">Zone 4</option>
+                            <option value="5">Zone 5</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cadence</label>
+                        <input type="text" id="int-cadence" placeholder="85-90">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">HR %</label>
+                        <input type="text" id="int-hr" placeholder="65%">
+                    </div>
                 </div>
+                <button class="btn btn-primary btn-sm" onclick="addInterval()">Add Interval</button>
             </div>
-
             <div class="admin-panel" id="panel-paste">
-                <div class="card">
-                    <div class="card-title">Paste Workout Text</div>
-                    <p style="color: var(--text-secondary); margin-bottom: 16px;">
-                        Paste the workout text from your email or message. Include duration and zone for each interval.
-                    </p>
-                    <div class="paste-area">
-                        <textarea id="paste-text" placeholder="Example:
+                <textarea id="paste-text" placeholder="Paste workout text here...
+Example:
 5:00 Zone 1 85-90 62.5%
-2:00 Zone 2 90-95 65%
-2:00 Zone 2A 95-100 75%
-..."></textarea>
-                    </div>
-                    <div class="btn-row">
-                        <button class="btn btn-primary" onclick="parsePastedText()">Parse Workout</button>
-                        <button class="btn btn-ghost" onclick="document.getElementById('paste-text').value=''">Clear</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <div class="card">
-                <div class="card-title">Current Workout</div>
-                <div id="workout-preview">
-                    <div class="empty-state">No intervals added</div>
-                </div>
+2:00 Zone 2 90-95 65%"></textarea>
                 <div class="btn-row">
-                    <button class="btn btn-primary" onclick="saveWorkout()">Save Workout</button>
-                    <button class="btn btn-danger" onclick="clearWorkout()">Clear All</button>
+                    <button class="btn btn-primary btn-sm" onclick="parsePastedText()">Parse</button>
+                    <button class="btn-ghost btn-sm" onclick="document.getElementById('paste-text').value=''">Clear</button>
                 </div>
             </div>
-        </section>
-
-        <!-- SETTINGS -->
-        <section id="settings-section" class="section">
-            <div class="card">
-                <div class="setting-group">
-                    <div class="setting-title">Text Size</div>
-                    <div class="setting-desc">Choose a comfortable size for viewing on handlebars</div>
-                    <div class="size-options">
-                        <button class="size-btn" onclick="setFontSize('small')">Small</button>
-                        <button class="size-btn active" onclick="setFontSize('medium')">Medium</button>
-                        <button class="size-btn" onclick="setFontSize('large')">Large</button>
-                        <button class="size-btn" onclick="setFontSize('xlarge')">Extra Large</button>
-                    </div>
-                </div>
-
-                <div class="divider"></div>
-
-                <div class="setting-group">
-                    <div class="setting-title">Power Zones</div>
-                    <div class="setting-desc">Customize zone ranges (% of FTP)</div>
-                    <div class="zone-grid" id="zone-config"></div>
-                    <button class="btn btn-primary" onclick="saveZones()" style="margin-top: 16px;">Save Zones</button>
-                </div>
+            <div class="divider"></div>
+            <div class="setting-title" style="margin-bottom: 12px;">Current Workout</div>
+            <div id="workout-preview"><div class="empty-state">No intervals</div></div>
+            <div class="btn-row">
+                <button class="btn btn-primary" onclick="saveWorkout()">Save & Publish</button>
+                <button class="btn btn-secondary" onclick="clearWorkout()">Clear All</button>
             </div>
-        </section>
+        </div>
     </div>
 
     <script>
         // Default zones
         const defaultZones = {
-            '1': { min: 55, max: 75 },
-            '2': { min: 75, max: 90 },
-            '2A': { min: 88, max: 94 },
-            '3': { min: 90, max: 105 },
-            '4': { min: 105, max: 120 },
-            '5': { min: 120, max: 150 }
+            '1': { min: 55, max: 75 }, '2': { min: 75, max: 90 }, '2A': { min: 88, max: 94 },
+            '3': { min: 90, max: 105 }, '4': { min: 105, max: 120 }, '5': { min: 120, max: 150 }
         };
 
         // State
-        let members = JSON.parse(localStorage.getItem('bhcc_members') || '[]');
+        let userProfile = JSON.parse(localStorage.getItem('bhcc_profile') || 'null');
         let zones = JSON.parse(localStorage.getItem('bhcc_zones')) || JSON.parse(JSON.stringify(defaultZones));
         let workout = JSON.parse(localStorage.getItem('bhcc_workout') || '[]');
         let tempWorkout = [...workout];
         let currentIntervalIndex = 0;
         let fontSize = localStorage.getItem('bhcc_fontSize') || 'medium';
-
-        // Timer state
-        let timerInterval = null;
-        let remainingSeconds = 0;
-        let timerRunning = false;
+        let timerInterval = null, remainingSeconds = 0, timerRunning = false;
+        const ADMIN_PASSWORD = 'BHCC';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             setFontSize(fontSize);
-            renderMembers();
-            renderRiderSelect();
-            renderWorkoutTable();
-            renderAdminIntervals();
             renderZoneConfig();
-            updateNoRiderWarning();
+            initProfile();
+            renderWorkoutTable();
 
-            // Listen for workout updates from Firebase (real-time sync)
+            // Firebase listener
             db.collection('workouts').doc('current').onSnapshot((doc) => {
                 const statusEl = document.getElementById('sync-status');
                 if (doc.exists) {
@@ -1231,48 +549,72 @@
                     localStorage.setItem('bhcc_workout', JSON.stringify(workout));
                     renderWorkoutTable();
                     renderAdminIntervals();
-                    statusEl.textContent = 'Synced';
+                    if (data.updatedAt) {
+                        const d = new Date(data.updatedAt);
+                        statusEl.textContent = `Updated ${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}`;
+                    } else {
+                        statusEl.textContent = 'Synced';
+                    }
                     statusEl.style.color = 'var(--success)';
                 } else {
-                    statusEl.textContent = 'Connected (no workout yet)';
+                    statusEl.textContent = 'No workout yet';
                     statusEl.style.color = 'var(--text-secondary)';
                 }
-            }, (error) => {
-                console.log('Firebase listener error:', error);
-                const statusEl = document.getElementById('sync-status');
-                statusEl.textContent = 'Offline (using local data)';
-                statusEl.style.color = 'var(--warning)';
+            }, () => {
+                document.getElementById('sync-status').textContent = 'Offline';
+                document.getElementById('sync-status').style.color = 'var(--warning)';
             });
         });
 
-        // Navigation
-        function showSection(section) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(t => t.classList.remove('active'));
-            document.getElementById(section + '-section').classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function showAdminPanel(panel) {
-            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('panel-' + panel).classList.add('active');
-            document.getElementById('tab-' + panel).classList.add('active');
-        }
-
-        // Font size
-        function setFontSize(size) {
-            fontSize = size;
-            document.body.className = 'font-' + size;
-            document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
-            const idx = ['small', 'medium', 'large', 'xlarge'].indexOf(size);
-            if (document.querySelectorAll('.size-btn')[idx]) {
-                document.querySelectorAll('.size-btn')[idx].classList.add('active');
+        // Profile
+        function initProfile() {
+            if (userProfile) {
+                document.getElementById('user-name').value = userProfile.name || '';
+                document.getElementById('user-ftp').value = userProfile.ftp || '';
+                document.getElementById('user-maxhr').value = userProfile.maxhr || '';
+                showProfileSummary();
             }
-            localStorage.setItem('bhcc_fontSize', size);
         }
 
-        // HR Input
+        function saveProfile() {
+            const name = document.getElementById('user-name').value.trim();
+            const ftpVal = document.getElementById('user-ftp').value;
+            const ftp = ftpVal ? parseInt(ftpVal) : null;
+            const maxhr = parseInt(document.getElementById('user-maxhr').value);
+
+            if (!name) { alert('Please enter your name'); return; }
+            if (ftp !== null && (ftp < 50 || ftp > 500)) { alert('FTP should be 50-500'); return; }
+            if (!maxhr || maxhr < 100 || maxhr > 220) { alert('Max HR should be 100-220'); return; }
+
+            userProfile = { name, ftp, maxhr };
+            localStorage.setItem('bhcc_profile', JSON.stringify(userProfile));
+            showProfileSummary();
+            renderWorkoutTable();
+            updateRideMode();
+        }
+
+        function showProfileSummary() {
+            document.getElementById('profile-form').style.display = 'none';
+            document.getElementById('profile-summary').style.display = 'flex';
+            document.getElementById('profile-toggle').textContent = 'Edit';
+            document.getElementById('display-ftp').textContent = userProfile.ftp ? userProfile.ftp + 'W' : '—';
+            document.getElementById('display-maxhr').textContent = userProfile.maxhr;
+            document.getElementById('profile-card').classList.add('collapsed');
+        }
+
+        function toggleProfileEdit() {
+            const card = document.getElementById('profile-card');
+            const isCollapsed = card.classList.contains('collapsed');
+            if (isCollapsed) {
+                card.classList.remove('collapsed');
+                document.getElementById('profile-form').style.display = 'block';
+                document.getElementById('profile-summary').style.display = 'none';
+                document.getElementById('profile-toggle').textContent = 'Cancel';
+            } else if (userProfile) {
+                showProfileSummary();
+            }
+        }
+
         function toggleHRInput(mode) {
             document.getElementById('hr-direct-input').style.display = mode === 'direct' ? 'block' : 'none';
             document.getElementById('hr-age-input').style.display = mode === 'age' ? 'block' : 'none';
@@ -1281,209 +623,117 @@
         }
 
         function calculateHRFromAge() {
-            const age = parseInt(document.getElementById('member-age').value);
-            if (age && age > 0 && age < 120) {
+            const age = parseInt(document.getElementById('user-age').value);
+            if (age > 0 && age < 120) {
                 const maxHR = 220 - age;
                 document.getElementById('estimated-hr').textContent = maxHR;
-                document.getElementById('member-maxhr').value = maxHR;
+                document.getElementById('user-maxhr').value = maxHR;
             } else {
                 document.getElementById('estimated-hr').textContent = '---';
             }
         }
 
-        // Members
-        function addMember() {
-            const name = document.getElementById('member-name').value.trim();
-            const ftpVal = document.getElementById('member-ftp').value;
-            const ftp = ftpVal ? parseInt(ftpVal) : null;
-            const maxhr = parseInt(document.getElementById('member-maxhr').value);
+        // Modals
+        function openModal(name) { document.getElementById('modal-' + name).classList.add('active'); }
+        function closeModal(name) { document.getElementById('modal-' + name).classList.remove('active'); }
 
-            if (!name) { alert('Please enter a name'); return; }
-            if (ftp !== null && (ftp < 50 || ftp > 500)) { alert('Please enter a valid FTP (50-500)'); return; }
-            if (!maxhr || maxhr < 100 || maxhr > 220) { alert('Please enter a valid Max HR (100-220)'); return; }
-
-            const existing = members.findIndex(m => m.name.toLowerCase() === name.toLowerCase());
-            if (existing >= 0) {
-                members[existing] = { name, ftp, maxhr };
-            } else {
-                members.push({ name, ftp, maxhr });
-            }
-
-            localStorage.setItem('bhcc_members', JSON.stringify(members));
-            renderMembers();
-            renderRiderSelect();
-
-            document.getElementById('member-name').value = '';
-            document.getElementById('member-ftp').value = '';
-            document.getElementById('member-maxhr').value = '';
-            document.getElementById('member-age').value = '';
-            document.getElementById('estimated-hr').textContent = '---';
-        }
-
-        function deleteMember(index) {
-            if (confirm('Remove ' + members[index].name + '?')) {
-                members.splice(index, 1);
-                localStorage.setItem('bhcc_members', JSON.stringify(members));
-                renderMembers();
-                renderRiderSelect();
+        function promptAdmin() {
+            const pw = prompt('Enter admin password:');
+            if (pw === ADMIN_PASSWORD) {
+                renderAdminIntervals();
+                openModal('admin');
+            } else if (pw !== null) {
+                alert('Incorrect password');
             }
         }
 
-        function renderMembers() {
-            const list = document.getElementById('member-list');
-            if (members.length === 0) {
-                list.innerHTML = '<div class="empty-state">No members yet</div>';
-                return;
-            }
-            list.innerHTML = members.map((m, i) => `
-                <div class="member-item">
-                    <div class="member-name">${m.name}</div>
-                    <div class="member-stats">
-                        <span>FTP: <strong>${m.ftp ? m.ftp + 'W' : '—'}</strong></span>
-                        <span>Max HR: <strong>${m.maxhr}</strong></span>
-                    </div>
-                    <button class="btn btn-danger" onclick="deleteMember(${i})" style="padding: 8px 16px;">Remove</button>
-                </div>
-            `).join('');
+        // Settings
+        function setFontSize(size) {
+            fontSize = size;
+            document.body.className = 'font-' + size;
+            document.querySelectorAll('.size-btn').forEach((btn, i) => {
+                btn.classList.toggle('active', ['small','medium','large','xlarge'][i] === size);
+            });
+            localStorage.setItem('bhcc_fontSize', size);
         }
 
-        function renderRiderSelect() {
-            const select = document.getElementById('current-rider');
-            const currentValue = select.value;
-            select.innerHTML = '<option value="">Select your name</option>' +
-                members.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-            if (currentValue && members.find(m => m.name === currentValue)) {
-                select.value = currentValue;
-            }
-            updateNoRiderWarning();
-        }
-
-        function updateNoRiderWarning() {
-            const riderName = document.getElementById('current-rider').value;
-            const warning = document.getElementById('no-rider-msg');
-            warning.style.display = (!riderName && members.length > 0) ? 'block' : 'none';
-        }
-
-        // Zones
         function renderZoneConfig() {
-            const container = document.getElementById('zone-config');
-            container.innerHTML = Object.entries(zones).map(([zone, range]) => `
-                <div class="zone-row">
-                    <label>Zone ${zone}</label>
-                    <input type="number" id="zone-${zone}-min" value="${range.min}" placeholder="Min">
-                    <input type="number" id="zone-${zone}-max" value="${range.max}" placeholder="Max">
-                </div>
-            `).join('');
+            document.getElementById('zone-config').innerHTML = Object.entries(zones).map(([z, r]) =>
+                `<div class="zone-row"><label>Zone ${z}</label><input type="number" id="zone-${z}-min" value="${r.min}" placeholder="Min"><input type="number" id="zone-${z}-max" value="${r.max}" placeholder="Max"></div>`
+            ).join('');
         }
 
         function saveZones() {
-            Object.keys(zones).forEach(zone => {
-                zones[zone].min = parseInt(document.getElementById(`zone-${zone}-min`).value) || zones[zone].min;
-                zones[zone].max = parseInt(document.getElementById(`zone-${zone}-max`).value) || zones[zone].max;
+            Object.keys(zones).forEach(z => {
+                zones[z].min = parseInt(document.getElementById(`zone-${z}-min`).value) || zones[z].min;
+                zones[z].max = parseInt(document.getElementById(`zone-${z}-max`).value) || zones[z].max;
             });
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
             alert('Zones saved');
             renderWorkoutTable();
         }
 
-        // Workout Admin
+        // Admin
+        function showAdminPanel(panel) {
+            document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('panel-' + panel).classList.add('active');
+            document.getElementById('tab-' + panel).classList.add('active');
+        }
+
         function parseDuration(str) {
             if (!str) return 0;
             const parts = str.trim().split(':');
-            if (parts.length === 2) {
-                return parseInt(parts[0]) * 60 + parseInt(parts[1]);
-            }
-            return parseInt(str) * 60 || 0;
+            return parts.length === 2 ? parseInt(parts[0]) * 60 + parseInt(parts[1]) : parseInt(str) * 60 || 0;
         }
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        function formatTime(secs) {
+            const m = Math.floor(secs / 60), s = secs % 60;
+            return `${m}:${s.toString().padStart(2, '0')}`;
         }
 
         function addInterval() {
             const duration = document.getElementById('int-duration').value.trim();
-            const zone = document.getElementById('int-zone').value;
-            const cadence = document.getElementById('int-cadence').value.trim();
-            const hr = document.getElementById('int-hr').value.trim();
-            const repeat = parseInt(document.getElementById('int-repeat').value);
-
-            if (!duration) { alert('Enter a duration'); return; }
-
+            if (!duration) { alert('Enter duration'); return; }
             tempWorkout.push({
                 duration: parseDuration(duration),
-                zone,
-                cadence: cadence || '-',
-                hrPercent: hr || '-',
-                repeat
+                zone: document.getElementById('int-zone').value,
+                cadence: document.getElementById('int-cadence').value.trim() || '-',
+                hrPercent: document.getElementById('int-hr').value.trim() || '-',
+                repeat: 1
             });
             renderAdminIntervals();
-
             document.getElementById('int-duration').value = '';
             document.getElementById('int-cadence').value = '';
             document.getElementById('int-hr').value = '';
-            document.getElementById('int-repeat').value = '1';
         }
 
-        function removeInterval(index) {
-            tempWorkout.splice(index, 1);
-            renderAdminIntervals();
-        }
+        function removeInterval(i) { tempWorkout.splice(i, 1); renderAdminIntervals(); }
 
         function renderAdminIntervals() {
-            const preview = document.getElementById('workout-preview');
-            if (tempWorkout.length === 0) {
-                preview.innerHTML = '<div class="empty-state">No intervals added</div>';
-                return;
-            }
-
-            let cumulative = 0;
-            preview.innerHTML = tempWorkout.map((int, i) => {
-                const startTime = formatTime(cumulative);
-                cumulative += int.duration * (int.repeat || 1);
-                const endTime = formatTime(cumulative);
-                const repeatLabel = int.repeat > 1 ? ` <span style="color:var(--accent)">x${int.repeat}</span>` : '';
-
-                return `
-                    <div class="interval-item">
-                        <span class="time">${startTime} → ${endTime}</span>
-                        <span>Zone ${int.zone}${repeatLabel}</span>
-                        <span>Cadence: ${int.cadence}</span>
-                        <span>HR: ${int.hrPercent}</span>
-                        <button class="btn btn-ghost" onclick="removeInterval(${i})" style="padding: 6px 12px;">Remove</button>
-                    </div>
-                `;
+            const el = document.getElementById('workout-preview');
+            if (tempWorkout.length === 0) { el.innerHTML = '<div class="empty-state">No intervals</div>'; return; }
+            let cum = 0;
+            el.innerHTML = tempWorkout.map((int, i) => {
+                const start = formatTime(cum);
+                cum += int.duration * (int.repeat || 1);
+                return `<div class="interval-item"><span class="time">${start}→${formatTime(cum)}</span><span>Z${int.zone}</span><span>${int.cadence}</span><span>${int.hrPercent}</span><button class="btn-ghost btn-sm" onclick="removeInterval(${i})">×</button></div>`;
             }).join('');
         }
 
         function parsePastedText() {
-            const text = document.getElementById('paste-text').value;
-            const lines = text.split('\n');
+            const lines = document.getElementById('paste-text').value.split('\n');
             const parsed = [];
-
             for (const line of lines) {
-                const durationMatch = line.match(/(\d{1,2}:\d{2})/);
-                const zoneMatch = line.match(/[Zz]one\s*(\d+[Aa]?)/i) || line.match(/[Zz](\d+[Aa]?)/);
-                const cadenceMatch = line.match(/(\d{2,3}\s*[-–]\s*\d{2,3})/);
-                const hrMatch = line.match(/(\d{2,3}(?:\.\d+)?)\s*%/);
-
-                if (durationMatch && zoneMatch) {
-                    parsed.push({
-                        duration: parseDuration(durationMatch[1]),
-                        zone: zoneMatch[1].toUpperCase(),
-                        cadence: cadenceMatch ? cadenceMatch[1].replace(/\s/g, '') : '-',
-                        hrPercent: hrMatch ? hrMatch[1] + '%' : '-',
-                        repeat: 1
-                    });
+                const dur = line.match(/(\d{1,2}:\d{2})/);
+                const zone = line.match(/[Zz]one?\s*(\d+[Aa]?)/i) || line.match(/[Zz](\d+[Aa]?)/);
+                const cad = line.match(/(\d{2,3}\s*[-–]\s*\d{2,3})/);
+                const hr = line.match(/(\d{2,3}(?:\.\d+)?)\s*%/);
+                if (dur && zone) {
+                    parsed.push({ duration: parseDuration(dur[1]), zone: zone[1].toUpperCase(), cadence: cad ? cad[1].replace(/\s/g,'') : '-', hrPercent: hr ? hr[1]+'%' : '-', repeat: 1 });
                 }
             }
-
-            if (parsed.length === 0) {
-                alert('Could not parse intervals. Make sure each line has duration (e.g., 2:00) and zone (e.g., Zone 2)');
-                return;
-            }
-
+            if (parsed.length === 0) { alert('Could not parse. Include duration (2:00) and zone (Zone 2) per line.'); return; }
             tempWorkout = parsed;
             renderAdminIntervals();
             showAdminPanel('manual');
@@ -1494,192 +744,117 @@
             if (tempWorkout.length === 0) { alert('Add intervals first'); return; }
             workout = [...tempWorkout];
             localStorage.setItem('bhcc_workout', JSON.stringify(workout));
-
-            // Save to Firebase for everyone
-            db.collection('workouts').doc('current').set({
-                intervals: workout,
-                updatedAt: new Date().toISOString()
-            }).then(() => {
-                alert('Workout saved and synced!');
-            }).catch((error) => {
-                console.error('Firebase save error:', error);
-                alert('Workout saved locally. Sync failed - check console.');
-            });
-
+            db.collection('workouts').doc('current').set({ intervals: workout, updatedAt: new Date().toISOString() })
+                .then(() => { alert('Workout published!'); closeModal('admin'); })
+                .catch(e => { console.error(e); alert('Save failed'); });
             renderWorkoutTable();
         }
 
         function clearWorkout() {
             if (confirm('Clear all intervals?')) {
-                tempWorkout = [];
-                workout = [];
+                tempWorkout = []; workout = [];
                 localStorage.removeItem('bhcc_workout');
-
-                // Clear from Firebase too
                 db.collection('workouts').doc('current').delete().catch(console.error);
-
-                renderAdminIntervals();
-                renderWorkoutTable();
+                renderAdminIntervals(); renderWorkoutTable();
             }
         }
 
         // Workout Display
         function expandWorkout() {
-            const expanded = [];
-            workout.forEach(int => {
-                const repeats = int.repeat || 1;
-                for (let i = 0; i < repeats; i++) {
-                    expanded.push({ ...int, repeat: 1 });
-                }
-            });
-            return expanded;
+            const exp = [];
+            workout.forEach(int => { for (let i = 0; i < (int.repeat||1); i++) exp.push({...int, repeat:1}); });
+            return exp;
         }
 
-        function calculatePower(zone, ftp) {
+        function calcPower(zone, ftp) {
             if (!ftp) return null;
-            const zoneConfig = zones[zone];
-            if (!zoneConfig) return null;
-            const minW = Math.round(ftp * zoneConfig.min / 100);
-            const maxW = Math.round(ftp * zoneConfig.max / 100);
-            return `${minW}-${maxW}`;
+            const z = zones[zone]; if (!z) return null;
+            return `${Math.round(ftp*z.min/100)}-${Math.round(ftp*z.max/100)}`;
         }
 
-        function calculateHR(hrPercent, maxhr) {
-            if (!hrPercent || hrPercent === '-') return '-';
-            const percent = parseFloat(hrPercent.replace('%', ''));
-            if (isNaN(percent)) return hrPercent;
-            return Math.round(maxhr * percent / 100);
+        function calcHR(pct, maxhr) {
+            if (!pct || pct === '-') return '-';
+            const p = parseFloat(pct.replace('%',''));
+            return isNaN(p) ? pct : Math.round(maxhr * p / 100);
         }
 
         function renderWorkoutTable() {
             const tbody = document.getElementById('workout-body');
-            const riderName = document.getElementById('current-rider').value;
-            const rider = members.find(m => m.name === riderName);
-
-            updateNoRiderWarning();
-
-            if (workout.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No workout loaded yet</td></tr>';
-                return;
-            }
-
-            const expanded = expandWorkout();
-            let cumulative = 0;
-
-            tbody.innerHTML = expanded.map((int, i) => {
-                cumulative += int.duration;
-                const timeStr = formatTime(cumulative);
-                const power = rider ? calculatePower(int.zone, rider.ftp) : null;
-                const hr = rider ? calculateHR(int.hrPercent, rider.maxhr) : int.hrPercent;
-                const isCurrent = i === currentIntervalIndex;
-
-                return `
-                    <tr class="${isCurrent ? 'current' : ''}" onclick="setCurrentInterval(${i})">
-                        <td>${timeStr}</td>
-                        <td>Z${int.zone}</td>
-                        <td>${power ? power + 'W' : '—'}</td>
-                        <td>${int.cadence}</td>
-                        <td>${typeof hr === 'number' ? hr : hr}</td>
-                    </tr>
-                `;
+            if (workout.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No workout loaded</td></tr>'; return; }
+            const exp = expandWorkout();
+            let cum = 0;
+            tbody.innerHTML = exp.map((int, i) => {
+                cum += int.duration;
+                const pwr = userProfile ? calcPower(int.zone, userProfile.ftp) : null;
+                const hr = userProfile ? calcHR(int.hrPercent, userProfile.maxhr) : int.hrPercent;
+                return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
             }).join('');
         }
 
-        function updateWorkoutDisplay() {
-            renderWorkoutTable();
-            updateRideMode();
-            updateNoRiderWarning();
-        }
-
-        function setCurrentInterval(index) {
-            currentIntervalIndex = index;
+        function setCurrentInterval(i) {
+            currentIntervalIndex = i;
             stopTimer();
-            // Reset timer to selected interval's duration
-            const expanded = expandWorkout();
-            if (expanded.length > 0) {
-                remainingSeconds = expanded[currentIntervalIndex].duration;
-            }
+            const exp = expandWorkout();
+            if (exp.length) remainingSeconds = exp[i].duration;
             renderWorkoutTable();
             updateRideMode();
         }
 
-        // Ride Mode
-        function toggleRideMode(enabled) {
-            document.getElementById('table-view').style.display = enabled ? 'none' : 'block';
-            document.getElementById('ride-mode').classList.toggle('active', enabled);
-            document.getElementById('btn-table').classList.toggle('active', !enabled);
-            document.getElementById('btn-ride').classList.toggle('active', enabled);
-            if (enabled) {
-                // Reset timer state when entering ride mode
-                const expanded = expandWorkout();
-                if (expanded.length > 0) {
-                    remainingSeconds = expanded[currentIntervalIndex].duration;
-                }
+        // Views
+        function setView(v) {
+            document.getElementById('table-view').style.display = v === 'table' ? 'block' : 'none';
+            document.getElementById('ride-mode').classList.toggle('active', v === 'ride');
+            document.getElementById('btn-table').classList.toggle('active', v === 'table');
+            document.getElementById('btn-ride').classList.toggle('active', v === 'ride');
+            if (v === 'ride') {
+                const exp = expandWorkout();
+                if (exp.length) remainingSeconds = exp[currentIntervalIndex].duration;
                 updateRideMode();
-            } else {
-                // Stop timer when leaving ride mode
-                stopTimer();
-            }
+            } else stopTimer();
         }
 
         function nextInterval() {
-            const expanded = expandWorkout();
-            if (currentIntervalIndex < expanded.length - 1) {
+            const exp = expandWorkout();
+            if (currentIntervalIndex < exp.length - 1) {
                 currentIntervalIndex++;
                 stopTimer();
-                // Reset timer to new interval's duration
-                remainingSeconds = expanded[currentIntervalIndex].duration;
+                remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
             }
-            // If at end, clicking does nothing (button shows "Workout complete!")
         }
 
         function prevInterval() {
-            const expanded = expandWorkout();
+            const exp = expandWorkout();
             if (currentIntervalIndex > 0) {
                 currentIntervalIndex--;
                 stopTimer();
-                // Reset timer to new interval's duration
-                remainingSeconds = expanded[currentIntervalIndex].duration;
+                remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
             }
         }
 
-        // Timer functions
-        function toggleTimer() {
-            if (timerRunning) {
-                stopTimer();
-            } else {
-                startTimer();
-            }
-        }
+        function toggleTimer() { timerRunning ? stopTimer() : startTimer(); }
 
         function startTimer() {
             if (remainingSeconds <= 0) {
-                const expanded = expandWorkout();
-                if (expanded.length > 0) {
-                    remainingSeconds = expanded[currentIntervalIndex].duration;
-                }
+                const exp = expandWorkout();
+                if (exp.length) remainingSeconds = exp[currentIntervalIndex].duration;
             }
             if (remainingSeconds <= 0) return;
-
             timerRunning = true;
             document.getElementById('play-icon').style.display = 'none';
             document.getElementById('pause-icon').style.display = 'block';
             document.getElementById('timer-btn').classList.add('active');
-
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateTimerDisplay();
-
                 if (remainingSeconds <= 0) {
-                    // Auto-advance to next interval
-                    const expanded = expandWorkout();
-                    if (currentIntervalIndex < expanded.length - 1) {
+                    const exp = expandWorkout();
+                    if (currentIntervalIndex < exp.length - 1) {
                         currentIntervalIndex++;
-                        remainingSeconds = expanded[currentIntervalIndex].duration;
+                        remainingSeconds = exp[currentIntervalIndex].duration;
                         renderWorkoutTable();
                         updateRideMode();
                     } else {
@@ -1692,10 +867,7 @@
 
         function stopTimer() {
             timerRunning = false;
-            if (timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-            }
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
             document.getElementById('timer-btn').classList.remove('active');
@@ -1703,66 +875,46 @@
 
         function resetIntervalTimer() {
             stopTimer();
-            const expanded = expandWorkout();
-            if (expanded.length > 0 && expanded[currentIntervalIndex]) {
-                remainingSeconds = expanded[currentIntervalIndex].duration;
+            const exp = expandWorkout();
+            if (exp.length && exp[currentIntervalIndex]) {
+                remainingSeconds = exp[currentIntervalIndex].duration;
                 updateTimerDisplay();
             }
         }
 
-        function updateTimerDisplay() {
-            document.getElementById('ride-time').textContent = formatTime(remainingSeconds);
-        }
+        function updateTimerDisplay() { document.getElementById('ride-time').textContent = formatTime(remainingSeconds); }
 
         function updateRideMode() {
-            const riderName = document.getElementById('current-rider').value;
-            const rider = members.find(m => m.name === riderName);
-            const expanded = expandWorkout();
-
-            if (expanded.length === 0) {
+            const exp = expandWorkout();
+            if (!exp.length) {
                 document.getElementById('ride-time').textContent = '--:--';
-                document.getElementById('ride-label').textContent = 'No workout loaded';
+                document.getElementById('ride-label').textContent = 'No workout';
                 return;
             }
-
-            const current = expanded[currentIntervalIndex];
-
-            // Initialize timer if not running
-            if (!timerRunning && remainingSeconds === 0) {
-                remainingSeconds = current.duration;
-            }
-
-            // Show countdown time (or current interval duration if timer not started)
-            document.getElementById('ride-time').textContent = formatTime(remainingSeconds || current.duration);
-            document.getElementById('ride-label').textContent = `Interval ${currentIntervalIndex + 1} of ${expanded.length} — Zone ${current.zone}`;
-
-            if (rider) {
-                const power = calculatePower(current.zone, rider.ftp);
-                document.getElementById('ride-power').textContent = power || '—';
-                const hr = calculateHR(current.hrPercent, rider.maxhr);
-                document.getElementById('ride-hr').textContent = typeof hr === 'number' ? hr : hr;
+            const cur = exp[currentIntervalIndex];
+            if (!timerRunning && remainingSeconds === 0) remainingSeconds = cur.duration;
+            document.getElementById('ride-time').textContent = formatTime(remainingSeconds || cur.duration);
+            document.getElementById('ride-label').textContent = `Interval ${currentIntervalIndex+1} of ${exp.length} — Zone ${cur.zone}`;
+            if (userProfile) {
+                const pwr = calcPower(cur.zone, userProfile.ftp);
+                document.getElementById('ride-power').textContent = pwr || '—';
+                document.getElementById('ride-hr').textContent = calcHR(cur.hrPercent, userProfile.maxhr);
             } else {
                 document.getElementById('ride-power').textContent = '---';
                 document.getElementById('ride-hr').textContent = '---';
             }
-
-            document.getElementById('ride-cadence').textContent = current.cadence;
-            document.getElementById('ride-duration').textContent = formatTime(current.duration);
-
-            const nextUpBtn = document.getElementById('next-up-btn');
-            const prevBtn = document.getElementById('prev-btn');
-
-            // Disable/enable prev button
-            prevBtn.disabled = currentIntervalIndex === 0;
-
-            if (currentIntervalIndex < expanded.length - 1) {
-                const next = expanded[currentIntervalIndex + 1];
-                const nextPower = rider && rider.ftp ? calculatePower(next.zone, rider.ftp) + 'W' : '';
-                document.getElementById('ride-next').textContent = `Zone ${next.zone} ${nextPower} for ${formatTime(next.duration)}`;
-                nextUpBtn.classList.remove('disabled');
+            document.getElementById('ride-cadence').textContent = cur.cadence;
+            document.getElementById('ride-duration').textContent = formatTime(cur.duration);
+            document.getElementById('prev-btn').disabled = currentIntervalIndex === 0;
+            const nextBtn = document.getElementById('next-up-btn');
+            if (currentIntervalIndex < exp.length - 1) {
+                const nxt = exp[currentIntervalIndex + 1];
+                const nxtPwr = userProfile?.ftp ? calcPower(nxt.zone, userProfile.ftp) + 'W' : '';
+                document.getElementById('ride-next').textContent = `Zone ${nxt.zone} ${nxtPwr} for ${formatTime(nxt.duration)}`;
+                nextBtn.classList.remove('disabled');
             } else {
                 document.getElementById('ride-next').textContent = 'Workout complete!';
-                nextUpBtn.classList.add('disabled');
+                nextBtn.classList.add('disabled');
             }
         }
     </script>
