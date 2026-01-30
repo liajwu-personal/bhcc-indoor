@@ -292,6 +292,24 @@
         .empty-state { text-align: center; padding: 32px; color: var(--text-secondary); }
         .divider { height: 1px; background: var(--border-subtle); margin: 20px 0; }
         .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+
+        /* Print Styles */
+        @media print {
+            body { background: white !important; color: black !important; font-size: 12pt !important; }
+            .header, .profile-card, .view-toggle, #ride-mode, .footer, .modal-overlay { display: none !important; }
+            .container { max-width: 100% !important; padding: 0 !important; }
+            #table-view { display: block !important; }
+            .table-container { border: 2px solid #333 !important; }
+            .workout-table { width: 100% !important; }
+            .workout-table th { background: #eee !important; color: black !important; font-size: 10pt !important; padding: 8px !important; border-bottom: 2px solid #333 !important; }
+            .workout-table td { color: black !important; font-size: 11pt !important; padding: 8px !important; border-bottom: 1px solid #ccc !important; }
+            .workout-table tr.current { background: #fff !important; }
+            .workout-table tr.current td { color: black !important; font-weight: normal !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            .print-header h2 { font-size: 18pt; margin-bottom: 4px; }
+            .print-header p { font-size: 10pt; color: #666; }
+        }
+        .print-header { display: none; }
     </style>
 </head>
 <body class="font-medium">
@@ -318,6 +336,9 @@
                 <div class="sync-status" id="sync-status">Connecting...</div>
             </div>
             <div class="header-actions">
+                <button class="icon-btn" onclick="printWorkout()" title="Print Workout">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                </button>
                 <button class="icon-btn" onclick="location.reload()" title="Refresh">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
@@ -362,6 +383,13 @@
                     <span class="profile-stat">Max HR: <strong id="display-maxhr">—</strong></span>
                 </div>
             </div>
+        </div>
+
+        <!-- Print Header (only shows when printing) -->
+        <div class="print-header" id="print-header">
+            <h2>BHCC Indoor Workout</h2>
+            <p id="print-date"></p>
+            <p id="print-profile"></p>
         </div>
 
         <!-- WORKOUT -->
@@ -624,6 +652,24 @@ Example:
             } else {
                 document.getElementById('estimated-hr').textContent = '---';
             }
+        }
+
+        // Print
+        function printWorkout() {
+            if (workout.length === 0) { alert('No workout to print'); return; }
+            // Set print date
+            const now = new Date();
+            document.getElementById('print-date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            // Set profile info if available
+            if (userProfile) {
+                const parts = [];
+                if (userProfile.ftp) parts.push('FTP: ' + userProfile.ftp + 'W');
+                if (userProfile.maxhr) parts.push('Max HR: ' + userProfile.maxhr + ' bpm');
+                document.getElementById('print-profile').textContent = parts.join(' | ');
+            } else {
+                document.getElementById('print-profile').textContent = '';
+            }
+            window.print();
         }
 
         // Modals
