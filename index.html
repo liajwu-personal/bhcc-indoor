@@ -490,18 +490,23 @@
             <div class="admin-tabs">
                 <button class="admin-tab active" onclick="showAdminPanel('ai')" id="tab-ai">AI Parse</button>
                 <button class="admin-tab" onclick="showAdminPanel('manual')" id="tab-manual">Manual</button>
-                <button class="admin-tab" onclick="showAdminPanel('paste')" id="tab-paste">Paste</button>
             </div>
             <div class="admin-panel active" id="panel-ai">
-                <textarea id="ai-text" placeholder="Paste or type your workout in any format...
-
-Examples:
-• 5 min warmup zone 1, then 3x2min zone 4 with 1min recovery
-• Warm up for 5 minutes, 10 intervals of 30 seconds hard / 30 seconds easy
-• Copy/paste from an email or training plan"></textarea>
+                <div class="form-group">
+                    <label class="form-label">Upload Screenshot</label>
+                    <input type="file" id="ai-image" accept="image/*" onchange="handleImageUpload(event)" style="display:none;">
+                    <div id="image-upload-area" onclick="document.getElementById('ai-image').click()" style="border: 2px dashed var(--border-default); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 12px;">
+                        <div id="image-preview" style="display:none; margin-bottom: 10px;"></div>
+                        <span id="upload-text" style="color: var(--text-secondary);">📷 Click to upload workout screenshot</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Or paste/type workout</label>
+                    <textarea id="ai-text" placeholder="5 min warmup zone 1, then 3x2min zone 4 with 1min recovery..." style="min-height: 80px;"></textarea>
+                </div>
                 <div class="btn-row">
                     <button class="btn btn-primary btn-sm" onclick="parseWithAI()" id="ai-parse-btn">Parse with AI</button>
-                    <button class="btn-ghost btn-sm" onclick="document.getElementById('ai-text').value=''">Clear</button>
+                    <button class="btn-ghost btn-sm" onclick="clearAIInput()">Clear</button>
                 </div>
                 <p id="ai-status" style="margin-top: 12px; font-size: 14px; color: var(--text-secondary);"></p>
             </div>
@@ -533,17 +538,7 @@ Examples:
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="addInterval()">Add Interval</button>
             </div>
-            <div class="admin-panel" id="panel-paste">
-                <textarea id="paste-text" placeholder="Paste workout text here...
-Example:
-5:00 Zone 1 85-90 62.5%
-2:00 Zone 2 90-95 65%"></textarea>
-                <div class="btn-row">
-                    <button class="btn btn-primary btn-sm" onclick="parsePastedText()">Parse</button>
-                    <button class="btn-ghost btn-sm" onclick="document.getElementById('paste-text').value=''">Clear</button>
-                </div>
-            </div>
-            <div class="divider"></div>
+                        <div class="divider"></div>
             <div class="setting-title" style="margin-bottom: 12px;">Current Workout</div>
             <div id="workout-preview"><div class="empty-state">No intervals</div></div>
             <div class="btn-row">
@@ -777,9 +772,36 @@ Example:
             }).join('');
         }
 
+        let uploadedImageData = null;
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImageData = e.target.result.split(',')[1]; // Get base64 without prefix
+                const preview = document.getElementById('image-preview');
+                preview.innerHTML = `<img src="${e.target.result}" style="max-width: 100%; max-height: 150px; border-radius: 8px;">`;
+                preview.style.display = 'block';
+                document.getElementById('upload-text').textContent = '✓ Image uploaded - click to change';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearAIInput() {
+            document.getElementById('ai-text').value = '';
+            document.getElementById('ai-image').value = '';
+            uploadedImageData = null;
+            document.getElementById('image-preview').style.display = 'none';
+            document.getElementById('image-preview').innerHTML = '';
+            document.getElementById('upload-text').textContent = '📷 Click to upload workout screenshot';
+            document.getElementById('ai-status').textContent = '';
+        }
+
         async function parseWithAI() {
             const text = document.getElementById('ai-text').value.trim();
-            if (!text) { alert('Enter workout description'); return; }
+            if (!text && !uploadedImageData) { alert('Upload a screenshot or enter workout text'); return; }
             if (!GEMINI_API_KEY) { alert('Gemini API key not configured. Add it to the code or use manual entry.'); return; }
 
             const statusEl = document.getElementById('ai-status');
@@ -794,20 +816,33 @@ Example:
 - cadence: string (e.g., "85-90" or "-" if not specified)
 - hrPercent: string (e.g., "65%" or "-" if not specified)
 
-Zone guide: Zone 1 = easy/warmup/recovery, Zone 2 = endurance, Zone 3 = tempo, Zone 4 = threshold/hard, Zone 5 = VO2max/very hard
+Zone guide: Zone 1 = easy/warmup/recovery, Zone 2 = endurance, Zone 2A = tempo, Zone 3 = tempo/sweetspot, Zone 4 = threshold/hard, Zone 5 = VO2max/very hard
 
-Workout text:
-${text}
+If you see "repeat above X times" or similar, expand those repetitions into individual intervals.
+If duration says "10 sec" that's 10 seconds. "2 minute" is 120 seconds. "1:30" is 90 seconds.
+
+${text ? 'Workout text:\n' + text : 'Extract the workout from the image.'}
 
 Respond ONLY with a valid JSON array, no explanation. Example:
 [{"duration":300,"zone":"1","cadence":"85-90","hrPercent":"62%"},{"duration":120,"zone":"4","cadence":"95-100","hrPercent":"85%"}]`;
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                // Build request parts
+                const parts = [{ text: prompt }];
+                if (uploadedImageData) {
+                    parts.unshift({
+                        inline_data: {
+                            mime_type: 'image/jpeg',
+                            data: uploadedImageData
+                        }
+                    });
+                }
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
+                        contents: [{ parts }],
                         generationConfig: { temperature: 0.1 }
                     })
                 });
@@ -843,25 +878,6 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                 btn.disabled = false;
                 btn.textContent = 'Parse with AI';
             }
-        }
-
-        function parsePastedText() {
-            const lines = document.getElementById('paste-text').value.split('\n');
-            const parsed = [];
-            for (const line of lines) {
-                const dur = line.match(/(\d{1,2}:\d{2})/);
-                const zone = line.match(/[Zz]one?\s*(\d+[Aa]?)/i) || line.match(/[Zz](\d+[Aa]?)/);
-                const cad = line.match(/(\d{2,3}\s*[-–]\s*\d{2,3})/);
-                const hr = line.match(/(\d{2,3}(?:\.\d+)?)\s*%/);
-                if (dur && zone) {
-                    parsed.push({ duration: parseDuration(dur[1]), zone: zone[1].toUpperCase(), cadence: cad ? cad[1].replace(/\s/g,'') : '-', hrPercent: hr ? hr[1]+'%' : '-', repeat: 1 });
-                }
-            }
-            if (parsed.length === 0) { alert('Could not parse. Include duration (2:00) and zone (Zone 2) per line.'); return; }
-            tempWorkout = parsed;
-            renderAdminIntervals();
-            showAdminPanel('manual');
-            alert(`Parsed ${parsed.length} intervals`);
         }
 
         function saveWorkout() {
