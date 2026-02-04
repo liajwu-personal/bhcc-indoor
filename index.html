@@ -488,10 +488,24 @@
                 </button>
             </div>
             <div class="admin-tabs">
-                <button class="admin-tab active" onclick="showAdminPanel('manual')" id="tab-manual">Manual</button>
-                <button class="admin-tab" onclick="showAdminPanel('paste')" id="tab-paste">Paste Text</button>
+                <button class="admin-tab active" onclick="showAdminPanel('ai')" id="tab-ai">AI Parse</button>
+                <button class="admin-tab" onclick="showAdminPanel('manual')" id="tab-manual">Manual</button>
+                <button class="admin-tab" onclick="showAdminPanel('paste')" id="tab-paste">Paste</button>
             </div>
-            <div class="admin-panel active" id="panel-manual">
+            <div class="admin-panel active" id="panel-ai">
+                <textarea id="ai-text" placeholder="Paste or type your workout in any format...
+
+Examples:
+• 5 min warmup zone 1, then 3x2min zone 4 with 1min recovery
+• Warm up for 5 minutes, 10 intervals of 30 seconds hard / 30 seconds easy
+• Copy/paste from an email or training plan"></textarea>
+                <div class="btn-row">
+                    <button class="btn btn-primary btn-sm" onclick="parseWithAI()" id="ai-parse-btn">Parse with AI</button>
+                    <button class="btn-ghost btn-sm" onclick="document.getElementById('ai-text').value=''">Clear</button>
+                </div>
+                <p id="ai-status" style="margin-top: 12px; font-size: 14px; color: var(--text-secondary);"></p>
+            </div>
+            <div class="admin-panel" id="panel-manual">
                 <div class="interval-grid">
                     <div class="form-group">
                         <label class="form-label">Duration</label>
@@ -554,7 +568,9 @@ Example:
         let currentIntervalIndex = 0;
         let fontSize = localStorage.getItem('bhcc_fontSize') || 'medium';
         let timerInterval = null, remainingSeconds = 0, timerRunning = false;
+        let wakeLock = null;
         const ADMIN_PASSWORD = 'BHCC';
+        const GEMINI_API_KEY = 'AIzaSyBbPd_xoE4qkpFJKbhMn7U4dEAHrGYpDPI';
 
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
@@ -680,6 +696,7 @@ Example:
             const pw = prompt('Enter admin password:');
             if (pw === ADMIN_PASSWORD) {
                 renderAdminIntervals();
+                showAdminPanel('ai'); // Default to AI tab
                 openModal('admin');
             } else if (pw !== null) {
                 alert('Incorrect password');
@@ -758,6 +775,74 @@ Example:
                 cum += int.duration * (int.repeat || 1);
                 return `<div class="interval-item"><span class="time">${start}→${formatTime(cum)}</span><span>Z${int.zone}</span><span>${int.cadence}</span><span>${int.hrPercent}</span><button class="btn-ghost btn-sm" onclick="removeInterval(${i})">×</button></div>`;
             }).join('');
+        }
+
+        async function parseWithAI() {
+            const text = document.getElementById('ai-text').value.trim();
+            if (!text) { alert('Enter workout description'); return; }
+            if (!GEMINI_API_KEY) { alert('Gemini API key not configured. Add it to the code or use manual entry.'); return; }
+
+            const statusEl = document.getElementById('ai-status');
+            const btn = document.getElementById('ai-parse-btn');
+            btn.disabled = true;
+            btn.textContent = 'Parsing...';
+            statusEl.textContent = 'Sending to Gemini...';
+
+            const prompt = `Parse this cycling workout into a structured JSON array. Each interval should have:
+- duration: number (seconds)
+- zone: string ("1", "2", "2A", "3", "4", or "5")
+- cadence: string (e.g., "85-90" or "-" if not specified)
+- hrPercent: string (e.g., "65%" or "-" if not specified)
+
+Zone guide: Zone 1 = easy/warmup/recovery, Zone 2 = endurance, Zone 3 = tempo, Zone 4 = threshold/hard, Zone 5 = VO2max/very hard
+
+Workout text:
+${text}
+
+Respond ONLY with a valid JSON array, no explanation. Example:
+[{"duration":300,"zone":"1","cadence":"85-90","hrPercent":"62%"},{"duration":120,"zone":"4","cadence":"95-100","hrPercent":"85%"}]`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.1 }
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                const content = data.candidates[0].content.parts[0].text;
+                // Extract JSON from response (handle markdown code blocks)
+                const jsonMatch = content.match(/\[[\s\S]*\]/);
+                if (!jsonMatch) throw new Error('Could not parse AI response');
+
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('No intervals found');
+
+                // Validate and normalize
+                tempWorkout = parsed.map(int => ({
+                    duration: parseInt(int.duration) || 60,
+                    zone: String(int.zone || '2').toUpperCase(),
+                    cadence: int.cadence || '-',
+                    hrPercent: int.hrPercent || '-',
+                    repeat: 1
+                }));
+
+                renderAdminIntervals();
+                statusEl.textContent = `✓ Parsed ${tempWorkout.length} intervals`;
+                statusEl.style.color = 'var(--success)';
+            } catch (err) {
+                console.error(err);
+                statusEl.textContent = `Error: ${err.message}`;
+                statusEl.style.color = 'var(--danger)';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Parse with AI';
+            }
         }
 
         function parsePastedText() {
@@ -839,6 +924,33 @@ Example:
             updateRideMode();
         }
 
+        // Wake Lock (keeps screen on)
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    console.log('Wake lock active');
+                } catch (err) {
+                    console.log('Wake lock failed:', err);
+                }
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock) {
+                wakeLock.release();
+                wakeLock = null;
+                console.log('Wake lock released');
+            }
+        }
+
+        // Re-acquire wake lock when page becomes visible again
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && document.getElementById('ride-mode').classList.contains('active')) {
+                requestWakeLock();
+            }
+        });
+
         // Views
         function setView(v) {
             document.getElementById('table-view').style.display = v === 'table' ? 'block' : 'none';
@@ -849,7 +961,11 @@ Example:
                 const exp = expandWorkout();
                 if (exp.length) remainingSeconds = exp[currentIntervalIndex].duration;
                 updateRideMode();
-            } else stopTimer();
+                requestWakeLock();
+            } else {
+                stopTimer();
+                releaseWakeLock();
+            }
         }
 
         function nextInterval() {
@@ -860,6 +976,8 @@ Example:
                 remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
+                startTimer(); // Auto-start on advance
+                syncTimerState();
             }
         }
 
@@ -871,6 +989,8 @@ Example:
                 remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
+                startTimer(); // Auto-start on advance
+                syncTimerState();
             }
         }
 
@@ -883,12 +1003,15 @@ Example:
             }
             if (remainingSeconds <= 0) return;
             timerRunning = true;
+            isLeader = true; // Person who starts becomes leader
             document.getElementById('play-icon').style.display = 'none';
             document.getElementById('pause-icon').style.display = 'block';
             document.getElementById('timer-btn').classList.add('active');
+            syncTimerState(); // Sync start
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateTimerDisplay();
+                syncTimerState(); // Sync every second
                 if (remainingSeconds <= 0) {
                     const exp = expandWorkout();
                     if (currentIntervalIndex < exp.length - 1) {
@@ -896,6 +1019,7 @@ Example:
                         remainingSeconds = exp[currentIntervalIndex].duration;
                         renderWorkoutTable();
                         updateRideMode();
+                        syncTimerState();
                     } else {
                         stopTimer();
                         document.getElementById('ride-time').textContent = 'Done!';
@@ -906,10 +1030,18 @@ Example:
 
         function stopTimer() {
             timerRunning = false;
+            isLeader = false;
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
             document.getElementById('timer-btn').classList.remove('active');
+            // Sync stop state
+            db.collection('workouts').doc('timer').set({
+                intervalIndex: currentIntervalIndex,
+                remainingSeconds: remainingSeconds,
+                isRunning: false,
+                timestamp: Date.now()
+            }).catch(console.error);
         }
 
         function resetIntervalTimer() {
@@ -922,6 +1054,55 @@ Example:
         }
 
         function updateTimerDisplay() { document.getElementById('ride-time').textContent = formatTime(remainingSeconds); }
+
+        // Firebase Timer Sync
+        let isLeader = false; // First person to start becomes leader
+        let lastSyncTime = 0;
+
+        function syncTimerState() {
+            if (!timerRunning) return;
+            const now = Date.now();
+            if (now - lastSyncTime < 500) return; // Throttle updates
+            lastSyncTime = now;
+            db.collection('workouts').doc('timer').set({
+                intervalIndex: currentIntervalIndex,
+                remainingSeconds: remainingSeconds,
+                isRunning: timerRunning,
+                timestamp: now
+            }).catch(console.error);
+        }
+
+        // Listen for timer sync from leader
+        db.collection('workouts').doc('timer').onSnapshot((doc) => {
+            if (!doc.exists) return;
+            const data = doc.data();
+            const timeDiff = (Date.now() - data.timestamp) / 1000;
+
+            // Only sync if we're not the one who sent this update
+            if (timerRunning && isLeader) return;
+
+            // Sync interval position
+            if (data.intervalIndex !== currentIntervalIndex) {
+                currentIntervalIndex = data.intervalIndex;
+                renderWorkoutTable();
+            }
+
+            // Sync timer (adjust for network latency)
+            const adjustedTime = Math.max(0, data.remainingSeconds - Math.floor(timeDiff));
+            if (Math.abs(adjustedTime - remainingSeconds) > 2) {
+                remainingSeconds = adjustedTime;
+                updateTimerDisplay();
+            }
+
+            // Sync running state
+            if (data.isRunning && !timerRunning) {
+                startTimer();
+            } else if (!data.isRunning && timerRunning) {
+                stopTimer();
+            }
+
+            updateRideMode();
+        });
 
         function updateRideMode() {
             const exp = expandWorkout();
