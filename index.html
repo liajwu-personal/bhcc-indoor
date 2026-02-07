@@ -188,6 +188,9 @@
             display: flex; align-items: center; gap: 6px;
         }
         .ride-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+        #lead-btn { background: var(--bg-elevated); border: 1px solid var(--border-default); }
+        #lead-btn.active { background: var(--success); border-color: var(--success); color: white; }
+        .controls-disabled { opacity: 0.5; pointer-events: none; }
         .ride-prev svg { width: 20px; height: 20px; }
         .ride-time {
             font-size: var(--font-size-massive); font-weight: 700;
@@ -429,7 +432,11 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
                         Previous
                     </button>
+                    <button class="btn btn-sm" id="lead-btn" onclick="toggleLeader()" style="margin-left: auto;">
+                        Lead Class
+                    </button>
                 </div>
+                <div id="leader-status" style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"></div>
                 <div class="ride-time" id="ride-time">0:00</div>
                 <div class="ride-label" id="ride-label">Interval 1 of 1</div>
                 <div class="timer-controls">
@@ -1040,11 +1047,22 @@ Respond ONLY with a valid JSON array, no explanation. Example:
 
         function setCurrentInterval(i) {
             currentIntervalIndex = i;
-            stopTimer();
+            stopTimer(false);
             const exp = expandWorkout();
             if (exp.length) remainingSeconds = exp[i].duration;
             renderWorkoutTable();
             updateRideMode();
+            // Sync the new interval position to everyone (only if we're the leader or no one is leading)
+            if (isLeader || !currentLeaderId) {
+                db.collection('workouts').doc('timer').set({
+                    intervalIndex: currentIntervalIndex,
+                    remainingSeconds: remainingSeconds,
+                    isRunning: false,
+                    timestamp: Date.now(),
+                    leaderId: isLeader ? sessionId : currentLeaderId,
+                    leaderName: isLeader ? 'Leader' : null
+                }).catch(console.error);
+            }
         }
 
         // Wake Lock (keeps screen on)
@@ -1084,57 +1102,64 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                 const exp = expandWorkout();
                 if (exp.length) remainingSeconds = exp[currentIntervalIndex].duration;
                 updateRideMode();
+                updateLeaderUI();
                 requestWakeLock();
             } else {
-                stopTimer();
+                stopTimer(true); // Sync when leaving ride mode
                 releaseWakeLock();
             }
         }
 
         function nextInterval() {
+            // Only allow if we're the leader or no one is leading
+            if (currentLeaderId && currentLeaderId !== sessionId && !isLeader) return;
             const exp = expandWorkout();
             if (currentIntervalIndex < exp.length - 1) {
                 currentIntervalIndex++;
-                stopTimer();
+                stopTimer(false); // Don't sync yet
                 remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
-                startTimer(); // Auto-start on advance
-                syncTimerState();
+                startTimer(true); // Manual start, become leader and sync
             }
         }
 
         function prevInterval() {
+            // Only allow if we're the leader or no one is leading
+            if (currentLeaderId && currentLeaderId !== sessionId && !isLeader) return;
             const exp = expandWorkout();
             if (currentIntervalIndex > 0) {
                 currentIntervalIndex--;
-                stopTimer();
+                stopTimer(false); // Don't sync yet
                 remainingSeconds = exp[currentIntervalIndex].duration;
                 renderWorkoutTable();
                 updateRideMode();
-                startTimer(); // Auto-start on advance
-                syncTimerState();
+                startTimer(true); // Manual start, become leader and sync
             }
         }
 
-        function toggleTimer() { timerRunning ? stopTimer() : startTimer(); }
+        function toggleTimer() { timerRunning ? stopTimer(true) : startTimer(true); }
 
-        function startTimer() {
+        function startTimer(isManual = true) {
             if (remainingSeconds <= 0) {
                 const exp = expandWorkout();
                 if (exp.length) remainingSeconds = exp[currentIntervalIndex].duration;
             }
             if (remainingSeconds <= 0) return;
             timerRunning = true;
-            isLeader = true; // Person who starts becomes leader
+            // Only become leader if: manual start AND (no current leader OR we're already the leader)
+            if (isManual && (!currentLeaderId || currentLeaderId === sessionId)) {
+                isLeader = true;
+                currentLeaderId = sessionId;
+            }
             document.getElementById('play-icon').style.display = 'none';
             document.getElementById('pause-icon').style.display = 'block';
             document.getElementById('timer-btn').classList.add('active');
-            syncTimerState(); // Sync start
+            if (isLeader) syncTimerState();
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateTimerDisplay();
-                syncTimerState(); // Sync every second
+                if (isLeader) syncTimerState();
                 if (remainingSeconds <= 0) {
                     const exp = expandWorkout();
                     if (currentIntervalIndex < exp.length - 1) {
@@ -1142,35 +1167,39 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                         remainingSeconds = exp[currentIntervalIndex].duration;
                         renderWorkoutTable();
                         updateRideMode();
-                        syncTimerState();
+                        if (isLeader) syncTimerState();
                     } else {
-                        stopTimer();
+                        stopTimer(isLeader);
                         document.getElementById('ride-time').textContent = 'Done!';
                     }
                 }
             }, 1000);
+            if (isManual) updateLeaderUI();
         }
 
-        function stopTimer() {
+        function stopTimer(shouldSync = true) {
             timerRunning = false;
-            isLeader = false;
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
             document.getElementById('timer-btn').classList.remove('active');
-            // Sync stop state
-            db.collection('workouts').doc('timer').set({
-                intervalIndex: currentIntervalIndex,
-                remainingSeconds: remainingSeconds,
-                isRunning: false,
-                timestamp: Date.now()
-            }).catch(console.error);
+            // Only sync if we are the leader
+            if (shouldSync && isLeader) {
+                db.collection('workouts').doc('timer').set({
+                    intervalIndex: currentIntervalIndex,
+                    remainingSeconds: remainingSeconds,
+                    isRunning: false,
+                    timestamp: Date.now(),
+                    leaderId: sessionId,
+                    leaderName: 'Leader'
+                }).catch(console.error);
+            }
+            // Note: Don't clear isLeader here - leadership is managed via toggleLeader()
         }
 
         function resetIntervalTimer() {
             // Stop timer without syncing old value
             timerRunning = false;
-            isLeader = false;
             if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
@@ -1181,24 +1210,95 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             if (exp.length && exp[currentIntervalIndex]) {
                 remainingSeconds = exp[currentIntervalIndex].duration;
                 updateTimerDisplay();
-                // Sync the reset value
-                db.collection('workouts').doc('timer').set({
-                    intervalIndex: currentIntervalIndex,
-                    remainingSeconds: remainingSeconds,
-                    isRunning: false,
-                    timestamp: Date.now()
-                }).catch(console.error);
+                // Sync the reset value (only if we're the leader or no one is leading)
+                if (isLeader || !currentLeaderId) {
+                    db.collection('workouts').doc('timer').set({
+                        intervalIndex: currentIntervalIndex,
+                        remainingSeconds: remainingSeconds,
+                        isRunning: false,
+                        timestamp: Date.now(),
+                        leaderId: isLeader ? sessionId : null,
+                        leaderName: isLeader ? 'Leader' : null
+                    }).catch(console.error);
+                }
             }
         }
 
         function updateTimerDisplay() { document.getElementById('ride-time').textContent = formatTime(remainingSeconds); }
 
         // Firebase Timer Sync
-        let isLeader = false; // First person to start becomes leader
+        let isLeader = false;
         let lastSyncTime = 0;
+        const sessionId = 'user_' + Math.random().toString(36).substr(2, 9);
+        let currentLeaderId = null;
+
+        function toggleLeader() {
+            if (isLeader) {
+                // Give up leadership
+                isLeader = false;
+                currentLeaderId = null;
+                db.collection('workouts').doc('timer').update({
+                    leaderId: null,
+                    leaderName: null
+                }).catch(console.error);
+                updateLeaderUI();
+            } else {
+                // Try to become leader
+                if (currentLeaderId && currentLeaderId !== sessionId) {
+                    if (!confirm('Someone else is currently leading. Take over control?')) {
+                        return;
+                    }
+                }
+                isLeader = true;
+                currentLeaderId = sessionId;
+                db.collection('workouts').doc('timer').set({
+                    intervalIndex: currentIntervalIndex,
+                    remainingSeconds: remainingSeconds,
+                    isRunning: timerRunning,
+                    timestamp: Date.now(),
+                    leaderId: sessionId,
+                    leaderName: 'Leader'
+                }, { merge: true }).catch(console.error);
+                updateLeaderUI();
+            }
+        }
+
+        function updateLeaderUI() {
+            const btn = document.getElementById('lead-btn');
+            const status = document.getElementById('leader-status');
+            const timerControls = document.querySelector('.timer-controls');
+            const nextBtn = document.getElementById('next-up-btn');
+            const prevBtn = document.getElementById('prev-btn');
+
+            if (isLeader) {
+                btn.classList.add('active');
+                btn.textContent = 'Leading';
+                status.textContent = 'You are leading this session';
+                status.style.color = 'var(--success)';
+                timerControls?.classList.remove('controls-disabled');
+                nextBtn?.classList.remove('controls-disabled');
+                prevBtn?.classList.remove('controls-disabled');
+            } else if (currentLeaderId) {
+                btn.classList.remove('active');
+                btn.textContent = 'Lead Class';
+                status.textContent = 'Following leader - controls synced';
+                status.style.color = 'var(--text-muted)';
+                timerControls?.classList.add('controls-disabled');
+                nextBtn?.classList.add('controls-disabled');
+                prevBtn?.classList.add('controls-disabled');
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = 'Lead Class';
+                status.textContent = 'No leader - tap Lead Class to control';
+                status.style.color = 'var(--text-muted)';
+                timerControls?.classList.remove('controls-disabled');
+                nextBtn?.classList.remove('controls-disabled');
+                prevBtn?.classList.remove('controls-disabled');
+            }
+        }
 
         function syncTimerState() {
-            if (!timerRunning) return;
+            if (!timerRunning || !isLeader) return;
             const now = Date.now();
             if (now - lastSyncTime < 500) return; // Throttle updates
             lastSyncTime = now;
@@ -1206,18 +1306,38 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                 intervalIndex: currentIntervalIndex,
                 remainingSeconds: remainingSeconds,
                 isRunning: timerRunning,
-                timestamp: now
+                timestamp: now,
+                leaderId: sessionId,
+                leaderName: 'Leader'
             }).catch(console.error);
         }
 
         function setupTimerSync() {
             db.collection('workouts').doc('timer').onSnapshot((doc) => {
-                if (!doc.exists) return;
+                if (!doc.exists) {
+                    currentLeaderId = null;
+                    updateLeaderUI();
+                    return;
+                }
                 const data = doc.data();
                 const timeDiff = (Date.now() - data.timestamp) / 1000;
 
-                // Only sync if we're not the one who sent this update
-                if (timerRunning && isLeader) return;
+                // Update leader tracking from Firebase
+                const previousLeaderId = currentLeaderId;
+                currentLeaderId = data.leaderId || null;
+
+                // If leader changed and we thought we were leader but aren't anymore
+                if (isLeader && currentLeaderId && currentLeaderId !== sessionId) {
+                    isLeader = false;
+                }
+
+                // Update leader UI if leader changed
+                if (previousLeaderId !== currentLeaderId) {
+                    updateLeaderUI();
+                }
+
+                // If we're the leader, don't sync timer from Firebase (we're the source of truth)
+                if (isLeader) return;
 
                 // Sync interval position
                 if (data.intervalIndex !== currentIntervalIndex) {
@@ -1227,16 +1347,14 @@ Respond ONLY with a valid JSON array, no explanation. Example:
 
                 // Sync timer (adjust for network latency)
                 const adjustedTime = Math.max(0, data.remainingSeconds - Math.floor(timeDiff));
-                if (Math.abs(adjustedTime - remainingSeconds) > 2) {
-                    remainingSeconds = adjustedTime;
-                    updateTimerDisplay();
-                }
+                remainingSeconds = adjustedTime;
+                updateTimerDisplay();
 
                 // Sync running state
                 if (data.isRunning && !timerRunning) {
-                    startTimer();
+                    startTimer(false); // false = not manual, don't become leader
                 } else if (!data.isRunning && timerRunning) {
-                    stopTimer();
+                    stopTimer(false); // false = don't sync back
                 }
 
                 updateRideMode();
