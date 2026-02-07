@@ -1376,11 +1376,17 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     renderWorkoutTable();
                 }
 
-                // Sync timer from leader
+                // Sync timer from leader - trust the leader's value directly
+                // Only adjust if the data is very stale (> 2 seconds old)
                 lastSyncedTime = data.remainingSeconds ?? 0;
-                lastSyncTimestamp = data.timestamp;
-                const adjustedTime = Math.max(0, lastSyncedTime - Math.floor(timeDiff));
-                remainingSeconds = adjustedTime;
+                lastSyncTimestamp = Date.now(); // Use local time for smooth display interval
+                if (timeDiff > 2) {
+                    // Data is stale, adjust for latency
+                    remainingSeconds = Math.max(0, lastSyncedTime - Math.floor(timeDiff));
+                } else {
+                    // Data is fresh, trust leader's value
+                    remainingSeconds = lastSyncedTime;
+                }
                 updateTimerDisplay();
 
                 // Sync running state
@@ -1391,17 +1397,22 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     document.getElementById('timer-btn').classList.add('active');
                     // Start follower display interval for smooth countdown between syncs
                     if (!followerDisplayInterval) {
+                        let lastTick = Date.now();
                         followerDisplayInterval = setInterval(() => {
                             if (!timerRunning || isLeader) {
                                 clearInterval(followerDisplayInterval);
                                 followerDisplayInterval = null;
                                 return;
                             }
-                            // Calculate time based on last sync + elapsed time
-                            const elapsed = (Date.now() - lastSyncTimestamp) / 1000;
-                            remainingSeconds = Math.max(0, lastSyncedTime - Math.floor(elapsed));
-                            updateTimerDisplay();
-                        }, 1000);
+                            // Simple decrement - Firebase sync will correct if we drift
+                            const now = Date.now();
+                            const elapsed = Math.floor((now - lastTick) / 1000);
+                            if (elapsed >= 1) {
+                                remainingSeconds = Math.max(0, remainingSeconds - elapsed);
+                                lastTick = now;
+                                updateTimerDisplay();
+                            }
+                        }, 250); // Check more frequently for smoother updates
                     }
                 } else if (!data.isRunning && timerRunning) {
                     timerRunning = false;
@@ -1432,7 +1443,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             }
             const cur = exp[currentIntervalIndex];
             if (!timerRunning && remainingSeconds === 0) remainingSeconds = cur.duration;
-            document.getElementById('ride-time').textContent = formatTime(remainingSeconds || cur.duration);
+            document.getElementById('ride-time').textContent = formatTime(remainingSeconds);
             document.getElementById('ride-label').textContent = `Interval ${currentIntervalIndex+1} of ${exp.length} — Zone ${cur.zone}`;
             if (userProfile) {
                 const pwr = calcPower(cur.zone, userProfile.ftp);
