@@ -259,10 +259,19 @@
         .admin-panel.active { display: block; }
         .interval-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 12px; }
         .interval-item {
-            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
-            padding: 12px; background: var(--bg-elevated); border-radius: 10px; margin-bottom: 8px; font-size: 14px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px; background: var(--bg-elevated); border-radius: 10px; margin-bottom: 8px; font-size: 14px;
         }
-        .interval-item .time { font-weight: 600; color: var(--accent); }
+        .interval-item .time { font-weight: 600; color: var(--accent); min-width: 90px; }
+        .interval-item input, .interval-item select {
+            padding: 6px 8px; font-size: 13px; width: auto; min-width: 50px;
+        }
+        .interval-item .duration-input { width: 60px; }
+        .interval-item .zone-select { width: 65px; }
+        .interval-item .cadence-input { width: 70px; }
+        .interval-item .hr-input { width: 55px; }
+        .interval-controls { display: flex; gap: 2px; margin-left: auto; }
+        .interval-controls button { padding: 4px 6px; font-size: 12px; }
         textarea {
             width: 100%; min-height: 150px; padding: 12px; font-family: 'SF Mono', Monaco, monospace;
             font-size: 14px; background: var(--bg-input); border: 1px solid var(--border-default);
@@ -468,14 +477,7 @@
                     <button class="size-btn" onclick="setFontSize('xlarge')">XL</button>
                 </div>
             </div>
-            <div class="divider"></div>
-            <div class="setting-group">
-                <div class="setting-title">Power Zones</div>
-                <div class="setting-desc">Customize zone ranges (% of FTP)</div>
-                <div class="zone-grid" id="zone-config"></div>
-                <button class="btn btn-primary btn-sm" onclick="saveZones()" style="margin-top: 12px;">Save Zones</button>
             </div>
-        </div>
     </div>
 
     <!-- Admin Modal -->
@@ -544,6 +546,12 @@
             <div class="btn-row">
                 <button class="btn btn-primary" onclick="saveWorkout()">Save & Publish</button>
                 <button class="btn btn-secondary" onclick="clearWorkout()">Clear All</button>
+            </div>
+            <div class="divider"></div>
+            <div class="setting-group">
+                <div class="setting-title">Power Zones (% of FTP)</div>
+                <div class="zone-grid" id="zone-config"></div>
+                <button class="btn btn-secondary btn-sm" onclick="saveZones()" style="margin-top: 12px;">Save Zones</button>
             </div>
         </div>
     </div>
@@ -705,6 +713,7 @@
                     }
                 }
                 renderAdminIntervals();
+                renderZoneConfig();
                 showAdminPanel('ai'); // Default to AI tab
                 openModal('admin');
             } else if (pw !== null) {
@@ -775,6 +784,24 @@
 
         function removeInterval(i) { tempWorkout.splice(i, 1); renderAdminIntervals(); }
 
+        function updateInterval(i, field, value) {
+            if (field === 'duration') {
+                tempWorkout[i].duration = parseDuration(value);
+            } else {
+                tempWorkout[i][field] = value;
+            }
+            renderAdminIntervals();
+        }
+
+        function moveInterval(i, direction) {
+            const newIndex = i + direction;
+            if (newIndex < 0 || newIndex >= tempWorkout.length) return;
+            const temp = tempWorkout[i];
+            tempWorkout[i] = tempWorkout[newIndex];
+            tempWorkout[newIndex] = temp;
+            renderAdminIntervals();
+        }
+
         function renderAdminIntervals() {
             const el = document.getElementById('workout-preview');
             if (tempWorkout.length === 0) { el.innerHTML = '<div class="empty-state">No intervals</div>'; return; }
@@ -782,7 +809,25 @@
             el.innerHTML = tempWorkout.map((int, i) => {
                 const start = formatTime(cum);
                 cum += int.duration * (int.repeat || 1);
-                return `<div class="interval-item"><span class="time">${start}→${formatTime(cum)}</span><span>Z${int.zone}</span><span>${int.cadence}</span><span>${int.hrPercent}</span><button class="btn-ghost btn-sm" onclick="removeInterval(${i})">×</button></div>`;
+                return `<div class="interval-item">
+                    <span class="time">${start}→${formatTime(cum)}</span>
+                    <input type="text" class="duration-input" value="${formatTime(int.duration)}" onchange="updateInterval(${i}, 'duration', this.value)" placeholder="2:00">
+                    <select class="zone-select" onchange="updateInterval(${i}, 'zone', this.value)">
+                        <option value="1" ${int.zone==='1'?'selected':''}>Z1</option>
+                        <option value="2" ${int.zone==='2'?'selected':''}>Z2</option>
+                        <option value="2A" ${int.zone==='2A'?'selected':''}>Z2A</option>
+                        <option value="3" ${int.zone==='3'?'selected':''}>Z3</option>
+                        <option value="4" ${int.zone==='4'?'selected':''}>Z4</option>
+                        <option value="5" ${int.zone==='5'?'selected':''}>Z5</option>
+                    </select>
+                    <input type="text" class="cadence-input" value="${int.cadence}" onchange="updateInterval(${i}, 'cadence', this.value)" placeholder="85-90">
+                    <input type="text" class="hr-input" value="${int.hrPercent}" onchange="updateInterval(${i}, 'hrPercent', this.value)" placeholder="65%">
+                    <div class="interval-controls">
+                        <button class="btn-ghost btn-sm" onclick="moveInterval(${i}, -1)" ${i===0?'disabled':''}>↑</button>
+                        <button class="btn-ghost btn-sm" onclick="moveInterval(${i}, 1)" ${i===tempWorkout.length-1?'disabled':''}>↓</button>
+                        <button class="btn-ghost btn-sm" onclick="removeInterval(${i})">×</button>
+                    </div>
+                </div>`;
             }).join('');
         }
 
