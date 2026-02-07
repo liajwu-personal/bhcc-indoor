@@ -155,7 +155,8 @@
         /* Ride Mode */
         .ride-mode { display: none; text-align: center; }
         .ride-mode.active { display: block; }
-        .ride-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .ride-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 12px; }
+        #leader-status { flex: 1; text-align: center; font-size: 11px; color: var(--text-dim); }
         .ride-prev {
             background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px;
             color: var(--text-primary); font-size: var(--text-sm); font-weight: 600;
@@ -171,27 +172,47 @@
 
         #leader-status { font-size: 11px; color: var(--text-dim); margin-bottom: 16px; }
 
+        .ride-zone { font-size: var(--text-xl); font-weight: 700; color: var(--accent); margin-bottom: 4px; }
         .ride-time {
             font-size: var(--text-timer); font-weight: 800; letter-spacing: -0.04em;
-            margin-bottom: 4px; font-variant-numeric: tabular-nums; line-height: 1;
+            margin-bottom: 16px; font-variant-numeric: tabular-nums; line-height: 1;
         }
-        .ride-label { font-size: var(--text-lg); color: var(--text-dim); margin-bottom: 20px; font-weight: 500; }
 
-        .timer-controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
-        .timer-btn {
-            background: var(--bg-elevated); border: 2px solid var(--border); border-radius: 50%;
-            width: 56px; height: 56px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--text-primary);
+        /* HR stat card with live/target */
+        .stat-target { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+        .stat-value.hr.in-zone { color: var(--success); }
+        .stat-value.hr.below-zone { color: var(--text-dim); } /* Gray - push harder */
+        .stat-value.hr.above-zone { color: var(--hr); } /* Red - ease off */
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .hr-live { animation: pulse 1s infinite; }
+
+        /* New ride controls row */
+        .ride-controls { display: flex; gap: 10px; margin-top: 16px; }
+        .ride-ctrl-btn {
+            background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px;
+            height: 56px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            cursor: pointer; color: var(--text-primary); font-weight: 600; font-size: var(--text-base);
+            padding: 0 20px;
         }
-        .timer-btn:hover { border-color: var(--accent); }
-        .timer-btn.active { background: var(--success); border-color: var(--success); }
-        .timer-btn svg { width: 22px; height: 22px; }
+        .ride-ctrl-btn:hover { border-color: var(--accent); }
+        .ride-ctrl-btn.playing { background: var(--hr); border-color: var(--hr); }
+        .ride-ctrl-btn svg { width: 22px; height: 22px; }
+        .ride-ctrl-btn.next-btn { flex: 1; background: var(--accent); border-color: var(--accent); }
+        .ride-ctrl-btn.next-btn:hover { background: #2563eb; }
+        .ride-ctrl-btn.next-btn.disabled { background: var(--bg-elevated); border-color: var(--border); opacity: 0.5; }
+
+        /* Header HR button connected state */
+        .icon-btn.hr-connected { color: var(--hr); }
 
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stats-grid.stats-3 { grid-template-columns: repeat(3, 1fr); }
         .stat-card {
             background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px;
             padding: 16px; text-align: center;
         }
+
+        /* Hide profile card in ride mode */
+        .ride-active #profile-card { display: none; }
         .stat-value { font-size: var(--text-2xl); font-weight: 800; line-height: 1; letter-spacing: -0.02em; }
         .stat-value.power { color: var(--power); }
         .stat-value.hr { color: var(--hr); }
@@ -200,23 +221,12 @@
         .stat-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
         .stat-unit { display: none; }
 
-        .next-up-card {
-            background: var(--accent); border-radius: 16px; padding: 20px;
-            cursor: pointer; border: none; width: 100%; text-align: center;
-        }
-        .next-up-card:hover { background: #2563eb; }
-        .next-up-card.disabled { background: var(--bg-elevated); cursor: default; }
-        .next-up-label { font-size: 10px; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
-        .next-up-card.disabled .next-up-label { color: var(--text-dim); }
-        .next-up-value { font-size: var(--text-lg); font-weight: 700; color: white; }
-        .next-up-card.disabled .next-up-value { color: var(--text-primary); }
-        .next-up-hint { display: none; }
 
         @media (max-width: 500px) {
             .stat-card { padding: 12px; }
             .stat-value { font-size: var(--text-xl) !important; }
             .ride-time { font-size: var(--text-2xl); }
-            .timer-btn { width: 48px; height: 48px; }
+            .ride-ctrl-btn { height: 48px; }
         }
 
         /* Modal */
@@ -329,14 +339,14 @@
                 <div class="sync-status" id="sync-status">Connecting...</div>
             </div>
             <div class="header-actions">
+                <button class="icon-btn" onclick="connectHeartRate()" id="hr-btn" title="Connect HR Monitor">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"/></svg>
+                </button>
                 <button class="icon-btn" onclick="printWorkout()" title="Print Workout">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
                 </button>
-                <button class="icon-btn" onclick="location.reload()" title="Refresh">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-                </button>
                 <button class="icon-btn" onclick="openModal('settings')" title="Text Size">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><text x="2" y="18" font-size="14" font-weight="bold" fill="currentColor" stroke="none">T</text><text x="12" y="18" font-size="10" font-weight="bold" fill="currentColor" stroke="none">t</text></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg>
                 </button>
             </div>
         </header>
@@ -409,38 +419,40 @@
                 <div class="ride-nav">
                     <button class="ride-prev" onclick="prevInterval()" id="prev-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-                        Previous
+                        Prev
                     </button>
-                    <button class="btn btn-sm" id="lead-btn" onclick="toggleLeader()" style="margin-left: auto;">
-                        Lead Class
+                    <div id="leader-status"></div>
+                    <button class="btn btn-sm" id="lead-btn" onclick="toggleLeader()">
+                        Lead
                     </button>
                 </div>
-                <div id="leader-status" style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"></div>
+
+                <div class="ride-zone" id="ride-zone">Zone 1</div>
                 <div class="ride-time" id="ride-time">0:00</div>
-                <div class="ride-label" id="ride-label">Interval 1 of 1</div>
-                <div class="timer-controls">
-                    <button class="timer-btn" onclick="toggleTimer()" id="timer-btn">
+
+                <div class="stats-grid stats-3">
+                    <div class="stat-card"><div class="stat-label">Power</div><div class="stat-value power" id="ride-power">---</div></div>
+                    <div class="stat-card" id="hr-card">
+                        <div class="stat-label">Heart Rate</div>
+                        <div class="stat-value hr" id="ride-hr-live">---</div>
+                        <div class="stat-target" id="ride-hr-target"></div>
+                    </div>
+                    <div class="stat-card"><div class="stat-label">Cadence</div><div class="stat-value cadence" id="ride-cadence">---</div></div>
+                </div>
+
+                <div class="ride-controls">
+                    <button class="ride-ctrl-btn" onclick="toggleTimer()" id="timer-btn">
                         <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
                         <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                     </button>
-                    <button class="timer-btn" onclick="resetIntervalTimer()">
+                    <button class="ride-ctrl-btn" onclick="resetIntervalTimer()" title="Reset">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                     </button>
+                    <button class="ride-ctrl-btn next-btn" onclick="nextInterval()" id="next-up-btn">
+                        <span id="ride-next">Z4 2:00</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+                    </button>
                 </div>
-                <div class="stats-grid">
-                    <div class="stat-card"><div class="stat-label">Power</div><div class="stat-value power" id="ride-power">---</div></div>
-                    <div class="stat-card" id="hr-card" onclick="connectHeartRate()" style="cursor:pointer;">
-                        <div class="stat-label" id="hr-label">Heart Rate</div>
-                        <div class="stat-value hr" id="ride-hr">---</div>
-                    </div>
-                    <div class="stat-card"><div class="stat-label">Cadence</div><div class="stat-value cadence" id="ride-cadence">---</div></div>
-                    <div class="stat-card"><div class="stat-label">Duration</div><div class="stat-value time" id="ride-duration">---</div></div>
-                </div>
-                <button class="next-up-card" onclick="nextInterval()" id="next-up-btn">
-                    <div class="next-up-label">Next Up</div>
-                    <div class="next-up-value" id="ride-next">---</div>
-                    <div class="next-up-hint">Tap to advance</div>
-                </button>
             </div>
         </div>
 
@@ -589,6 +601,18 @@
             }, () => {
                 document.getElementById('sync-status').textContent = 'Offline';
                 document.getElementById('sync-status').style.color = 'var(--warning)';
+            });
+
+            // Firebase listener for zones
+            db.collection('workouts').doc('zones').onSnapshot((doc) => {
+                if (doc.exists) {
+                    zones = doc.data().zones || JSON.parse(JSON.stringify(defaultZones));
+                    localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+                    renderZoneConfig();
+                    updateZoneSelect();
+                    renderAdminIntervals(); // Update zone dropdowns in workout preview
+                    renderWorkoutTable();
+                }
             });
 
             // Setup timer sync
@@ -743,7 +767,10 @@
                 }
             });
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
-            alert('Zones saved');
+            // Save to Firebase so all users get the same zones
+            db.collection('workouts').doc('zones').set({ zones, updatedAt: new Date().toISOString() })
+                .then(() => alert('Zones saved & synced!'))
+                .catch(e => { console.error(e); alert('Save failed'); });
             renderWorkoutTable();
             renderZoneConfig();
         }
@@ -757,6 +784,7 @@
             if (isNaN(min) || isNaN(max)) { alert('Enter min and max percentages'); return; }
             zones[name] = { min, max };
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            db.collection('workouts').doc('zones').set({ zones, updatedAt: new Date().toISOString() }).catch(console.error);
             renderZoneConfig();
             renderWorkoutTable();
         }
@@ -766,6 +794,7 @@
             if (!confirm(`Delete Zone ${name}?`)) return;
             delete zones[name];
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            db.collection('workouts').doc('zones').set({ zones, updatedAt: new Date().toISOString() }).catch(console.error);
             renderZoneConfig();
             renderWorkoutTable();
         }
@@ -780,6 +809,7 @@
             zones[newName] = zones[oldName];
             delete zones[oldName];
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            db.collection('workouts').doc('zones').set({ zones, updatedAt: new Date().toISOString() }).catch(console.error);
             renderZoneConfig();
             renderWorkoutTable();
         }
@@ -1080,6 +1110,8 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             document.getElementById('ride-mode').classList.toggle('active', v === 'ride');
             document.getElementById('btn-table').classList.toggle('active', v === 'table');
             document.getElementById('btn-ride').classList.toggle('active', v === 'ride');
+            // Hide profile card in ride mode for cleaner UI
+            document.querySelector('.container').classList.toggle('ride-active', v === 'ride');
             if (v === 'ride') {
                 const exp = expandWorkout();
                 // Only set remainingSeconds if not already set (e.g., from sync)
@@ -1139,7 +1171,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             }
             document.getElementById('play-icon').style.display = 'none';
             document.getElementById('pause-icon').style.display = 'block';
-            document.getElementById('timer-btn').classList.add('active');
+            document.getElementById('timer-btn').classList.add('playing');
             if (isLeader) syncTimerState();
 
             // Only leader runs the actual countdown interval
@@ -1173,7 +1205,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             if (followerDisplayInterval) { clearInterval(followerDisplayInterval); followerDisplayInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
-            document.getElementById('timer-btn').classList.remove('active');
+            document.getElementById('timer-btn').classList.remove('playing');
             // Only sync if we are the leader
             if (shouldSync && isLeader) {
                 db.collection('workouts').doc('timer').set({
@@ -1195,7 +1227,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             if (followerDisplayInterval) { clearInterval(followerDisplayInterval); followerDisplayInterval = null; }
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
-            document.getElementById('timer-btn').classList.remove('active');
+            document.getElementById('timer-btn').classList.remove('playing');
 
             // Reset to full duration
             const exp = expandWorkout();
@@ -1262,32 +1294,32 @@ Respond ONLY with a valid JSON array, no explanation. Example:
         function updateLeaderUI() {
             const btn = document.getElementById('lead-btn');
             const status = document.getElementById('leader-status');
-            const timerControls = document.querySelector('.timer-controls');
+            const rideControls = document.querySelector('.ride-controls');
             const nextBtn = document.getElementById('next-up-btn');
             const prevBtn = document.getElementById('prev-btn');
 
             if (isLeader) {
                 btn.classList.add('active');
                 btn.textContent = 'Leading';
-                status.textContent = 'You are leading this session';
+                status.textContent = '● Leading';
                 status.style.color = 'var(--success)';
-                timerControls?.classList.remove('controls-disabled');
+                rideControls?.classList.remove('controls-disabled');
                 nextBtn?.classList.remove('controls-disabled');
                 prevBtn?.classList.remove('controls-disabled');
             } else if (currentLeaderId) {
                 btn.classList.remove('active');
-                btn.textContent = 'Lead Class';
-                status.textContent = 'Following leader - controls synced';
-                status.style.color = 'var(--text-muted)';
-                timerControls?.classList.add('controls-disabled');
+                btn.textContent = 'Lead';
+                status.textContent = 'Following';
+                status.style.color = 'var(--text-dim)';
+                rideControls?.classList.add('controls-disabled');
                 nextBtn?.classList.add('controls-disabled');
                 prevBtn?.classList.add('controls-disabled');
             } else {
                 btn.classList.remove('active');
-                btn.textContent = 'Lead Class';
-                status.textContent = 'No leader - tap Lead Class to control';
-                status.style.color = 'var(--text-muted)';
-                timerControls?.classList.remove('controls-disabled');
+                btn.textContent = 'Lead';
+                status.textContent = '';
+                status.style.color = 'var(--text-dim)';
+                rideControls?.classList.remove('controls-disabled');
                 nextBtn?.classList.remove('controls-disabled');
                 prevBtn?.classList.remove('controls-disabled');
             }
@@ -1376,7 +1408,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     timerRunning = true;
                     document.getElementById('play-icon').style.display = 'none';
                     document.getElementById('pause-icon').style.display = 'block';
-                    document.getElementById('timer-btn').classList.add('active');
+                    document.getElementById('timer-btn').classList.add('playing');
                     // Start follower display interval for smooth countdown between syncs
                     if (!followerDisplayInterval) {
                         let lastTick = Date.now();
@@ -1404,7 +1436,7 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     }
                     document.getElementById('play-icon').style.display = 'block';
                     document.getElementById('pause-icon').style.display = 'none';
-                    document.getElementById('timer-btn').classList.remove('active');
+                    document.getElementById('timer-btn').classList.remove('playing');
                 }
 
                 updateRideMode();
@@ -1418,81 +1450,122 @@ Respond ONLY with a valid JSON array, no explanation. Example:
         let liveHeartRate = null;
 
         async function connectHeartRate() {
+            const hrBtn = document.getElementById('hr-btn');
+
             // Check if already connected
             if (hrDevice && hrDevice.gatt.connected) {
-                // Disconnect
                 hrDevice.gatt.disconnect();
                 hrDevice = null;
                 hrCharacteristic = null;
                 liveHeartRate = null;
-                document.getElementById('hr-label').textContent = 'Heart Rate';
-                document.getElementById('ride-hr').textContent = userProfile ? calcHR(expandWorkout()[currentIntervalIndex]?.hrPercent, userProfile.maxhr) : '---';
+                hrBtn.classList.remove('hr-connected');
+                updateRideMode(); // Refresh display
                 return;
             }
 
             // Check browser support
             if (!navigator.bluetooth) {
-                alert('Bluetooth not supported in this browser. Try Chrome or Edge.');
+                alert('Bluetooth not supported. Try Chrome or Edge.');
                 return;
             }
 
             try {
-                document.getElementById('hr-label').textContent = 'Connecting...';
+                hrBtn.style.opacity = '0.5';
 
-                // Request device with heart rate service
                 hrDevice = await navigator.bluetooth.requestDevice({
                     filters: [{ services: ['heart_rate'] }],
                     optionalServices: ['heart_rate']
                 });
 
-                // Connect to GATT server
                 const server = await hrDevice.gatt.connect();
                 const service = await server.getPrimaryService('heart_rate');
                 hrCharacteristic = await service.getCharacteristic('heart_rate_measurement');
 
-                // Start notifications
                 await hrCharacteristic.startNotifications();
                 hrCharacteristic.addEventListener('characteristicvaluechanged', handleHeartRateChange);
 
-                document.getElementById('hr-label').textContent = '♥ Live HR';
+                // Show connected state
+                hrBtn.style.opacity = '1';
+                hrBtn.classList.add('hr-connected');
+                updateRideMode(); // Refresh display
 
-                // Handle disconnection
                 hrDevice.addEventListener('gattserverdisconnected', () => {
                     liveHeartRate = null;
-                    document.getElementById('hr-label').textContent = 'Heart Rate';
-                    updateRideMode();
+                    hrBtn.classList.remove('hr-connected');
+                    updateRideMode(); // Refresh display
                 });
 
             } catch (error) {
                 console.log('Bluetooth error:', error);
-                document.getElementById('hr-label').textContent = 'Heart Rate';
-                if (error.name !== 'NotFoundError') { // User cancelled
-                    alert('Could not connect to heart rate monitor');
+                hrBtn.style.opacity = '1';
+                if (error.name !== 'NotFoundError') {
+                    alert('Could not connect to HR monitor');
                 }
             }
         }
 
         function handleHeartRateChange(event) {
             const value = event.target.value;
-            // Heart rate data format: first byte is flags, second byte is HR value (for 8-bit)
             const flags = value.getUint8(0);
-            let heartRate;
-            if (flags & 0x01) {
-                // 16-bit heart rate
-                heartRate = value.getUint16(1, true);
-            } else {
-                // 8-bit heart rate
-                heartRate = value.getUint8(1);
-            }
+            let heartRate = (flags & 0x01) ? value.getUint16(1, true) : value.getUint8(1);
             liveHeartRate = heartRate;
-            document.getElementById('ride-hr').textContent = heartRate;
+            updateHRDisplay();
+        }
+
+        // HR Zone ranges (% of max HR) based on 5-zone model
+        const hrZones = {
+            1: { min: 55, max: 70 },  // Active Recovery
+            2: { min: 65, max: 80 },  // Aerobic Endurance
+            3: { min: 77, max: 87 },  // Tempo
+            4: { min: 84, max: 94 },  // Threshold
+            5: { min: 90, max: 100 }  // VO2max
+        };
+
+        // Find which HR zone a target % falls into
+        function getHRZoneRange(targetPercent) {
+            if (targetPercent <= 70) return hrZones[1];
+            if (targetPercent <= 80) return hrZones[2];
+            if (targetPercent <= 87) return hrZones[3];
+            if (targetPercent <= 94) return hrZones[4];
+            return hrZones[5];
+        }
+
+        function updateHRDisplay() {
+            const hrEl = document.getElementById('ride-hr-live');
+            const targetEl = document.getElementById('ride-hr-target');
+
+            if (liveHeartRate && userProfile?.maxhr) {
+                hrEl.textContent = liveHeartRate;
+                hrEl.classList.add('hr-live');
+
+                const targetPercent = parseFloat(targetEl.dataset.targetPercent) || 0;
+                const livePercent = (liveHeartRate / userProfile.maxhr) * 100;
+
+                hrEl.classList.remove('in-zone', 'below-zone', 'above-zone');
+                if (targetPercent > 0) {
+                    // Get the HR zone range for this target
+                    const zoneRange = getHRZoneRange(targetPercent);
+
+                    if (livePercent >= zoneRange.min && livePercent <= zoneRange.max) {
+                        hrEl.classList.add('in-zone'); // Green - in the zone
+                    } else if (livePercent < zoneRange.min) {
+                        hrEl.classList.add('below-zone'); // Yellow - push harder
+                    } else {
+                        hrEl.classList.add('above-zone'); // Red - ease off
+                    }
+                }
+            } else if (liveHeartRate) {
+                hrEl.textContent = liveHeartRate;
+                hrEl.classList.add('hr-live');
+                hrEl.classList.remove('in-zone', 'below-zone', 'above-zone');
+            }
         }
 
         function updateRideMode() {
             const exp = expandWorkout();
             if (!exp.length) {
                 document.getElementById('ride-time').textContent = '--:--';
-                document.getElementById('ride-label').textContent = 'No workout';
+                document.getElementById('ride-zone').textContent = 'No workout';
                 return;
             }
             // Bounds check - reset to 0 if index is out of range
@@ -1502,31 +1575,47 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             const cur = exp[currentIntervalIndex];
             if (!timerRunning && remainingSeconds === 0) remainingSeconds = cur.duration;
             document.getElementById('ride-time').textContent = formatTime(remainingSeconds);
-            document.getElementById('ride-label').textContent = `Interval ${currentIntervalIndex+1} of ${exp.length} — Zone ${cur.zone}`;
+            document.getElementById('ride-zone').textContent = `Zone ${cur.zone}`;
+            const hrLiveEl = document.getElementById('ride-hr-live');
+            const hrTargetEl = document.getElementById('ride-hr-target');
+
             if (userProfile) {
                 const pwr = calcPower(cur.zone, userProfile.ftp);
                 document.getElementById('ride-power').textContent = pwr || '—';
-                // Only update HR display if not using live Bluetooth HR
-                if (liveHeartRate === null) {
-                    document.getElementById('ride-hr').textContent = calcHR(cur.hrPercent, userProfile.maxhr);
+
+                const targetHR = calcHR(cur.hrPercent, userProfile.maxhr);
+                // Store target as % for zone comparison (extract number from "65%" string)
+                const targetPercent = parseFloat(cur.hrPercent) || 0;
+                hrTargetEl.dataset.targetPercent = targetPercent;
+
+                if (liveHeartRate) {
+                    // Live HR connected - show live value with target below
+                    hrLiveEl.textContent = liveHeartRate;
+                    hrLiveEl.classList.add('hr-live');
+                    hrTargetEl.textContent = `target ${targetHR}`;
+                    updateHRDisplay();
+                } else {
+                    // No live HR - show target as main value
+                    hrLiveEl.textContent = targetHR;
+                    hrLiveEl.classList.remove('hr-live', 'in-zone', 'below-zone', 'above-zone');
+                    hrTargetEl.textContent = '';
                 }
             } else {
                 document.getElementById('ride-power').textContent = '---';
-                if (liveHeartRate === null) {
-                    document.getElementById('ride-hr').textContent = '---';
-                }
+                hrLiveEl.textContent = liveHeartRate || '---';
+                hrLiveEl.classList.remove('in-zone', 'below-zone', 'above-zone');
+                if (liveHeartRate) hrLiveEl.classList.add('hr-live');
+                hrTargetEl.textContent = '';
             }
             document.getElementById('ride-cadence').textContent = cur.cadence;
-            document.getElementById('ride-duration').textContent = formatTime(cur.duration);
             document.getElementById('prev-btn').disabled = currentIntervalIndex === 0;
             const nextBtn = document.getElementById('next-up-btn');
             if (currentIntervalIndex < exp.length - 1) {
                 const nxt = exp[currentIntervalIndex + 1];
-                const nxtPwr = userProfile?.ftp ? calcPower(nxt.zone, userProfile.ftp) + 'W' : '';
-                document.getElementById('ride-next').textContent = `Zone ${nxt.zone} ${nxtPwr} for ${formatTime(nxt.duration)}`;
+                document.getElementById('ride-next').textContent = `Z${nxt.zone} ${formatTime(nxt.duration)}`;
                 nextBtn.classList.remove('disabled');
             } else {
-                document.getElementById('ride-next').textContent = 'Workout complete!';
+                document.getElementById('ride-next').textContent = 'Finish';
                 nextBtn.classList.add('disabled');
             }
         }
