@@ -395,8 +395,8 @@
             <p id="print-profile"></p>
         </div>
 
-        <!-- WORKOUT -->
-        <div id="workout-section">
+        <!-- WORKOUT (hidden until profile is saved) -->
+        <div id="workout-section" style="display: none;">
             <div class="view-toggle">
                 <button class="view-btn active" onclick="setView('table')" id="btn-table">Table</button>
                 <button class="view-btn" onclick="setView('ride')" id="btn-ride">Ride Mode</button>
@@ -405,11 +405,11 @@
             <div id="table-view">
                 <div class="table-container">
                     <table class="workout-table">
-                        <thead>
-                            <tr><th>Time</th><th>Duration</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>
+                        <thead id="workout-head">
+                            <tr><th>Time</th><th>Duration</th><th>Zone</th><th>Cadence</th></tr>
                         </thead>
                         <tbody id="workout-body">
-                            <tr><td colspan="6" class="empty-state">No workout loaded yet</td></tr>
+                            <tr><td colspan="4" class="empty-state">No workout loaded yet</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -650,6 +650,8 @@
             document.getElementById('display-ftp').textContent = userProfile.ftp ? userProfile.ftp + 'W' : '—';
             document.getElementById('display-maxhr').textContent = userProfile.maxhr;
             document.getElementById('profile-card').classList.add('collapsed');
+            // Show workout section once profile is saved
+            document.getElementById('workout-section').style.display = 'block';
         }
 
         function toggleProfileEdit() {
@@ -1045,15 +1047,33 @@ Respond ONLY with a valid JSON array, no explanation. Example:
         }
 
         function renderWorkoutTable() {
+            const thead = document.getElementById('workout-head');
             const tbody = document.getElementById('workout-body');
-            if (workout.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No workout loaded</td></tr>'; return; }
+
+            // Show Power/HR columns only if user has profile
+            if (userProfile) {
+                thead.innerHTML = '<tr><th>Time</th><th>Duration</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>';
+            } else {
+                thead.innerHTML = '<tr><th>Time</th><th>Duration</th><th>Zone</th><th>Cadence</th></tr>';
+            }
+
+            const colCount = userProfile ? 6 : 4;
+            if (workout.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-state">No workout loaded</td></tr>`;
+                return;
+            }
+
             const exp = expandWorkout();
             let cum = 0;
             tbody.innerHTML = exp.map((int, i) => {
                 cum += int.duration;
-                const pwr = userProfile ? calcPower(int.zone, userProfile.ftp) : null;
-                const hr = userProfile ? calcHR(int.hrPercent, userProfile.maxhr) : int.hrPercent;
-                return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
+                if (userProfile) {
+                    const pwr = calcPower(int.zone, userProfile.ftp);
+                    const hr = calcHR(int.hrPercent, userProfile.maxhr);
+                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
+                } else {
+                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${int.cadence}</td></tr>`;
+                }
             }).join('');
         }
 
