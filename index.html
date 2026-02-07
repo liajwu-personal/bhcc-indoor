@@ -289,9 +289,11 @@
         }
         .size-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
         .zone-grid { display: flex; flex-direction: column; gap: 10px; }
-        .zone-row { display: grid; grid-template-columns: 70px 1fr 1fr; gap: 10px; align-items: center; }
+        .zone-row { display: grid; grid-template-columns: 70px 1fr 1fr auto; gap: 10px; align-items: center; }
         .zone-row label { font-weight: 500; color: var(--text-secondary); font-size: 14px; }
         .zone-row input { padding: 10px; font-size: 14px; }
+        .zone-row .zone-name-input { width: 60px; }
+        .add-zone-row { display: flex; gap: 10px; margin-top: 10px; }
 
         /* Footer */
         .footer { padding: 24px 0; text-align: center; border-top: 1px solid var(--border-subtle); margin-top: 32px; }
@@ -351,8 +353,8 @@
                 <button class="icon-btn" onclick="location.reload()" title="Refresh">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
                 </button>
-                <button class="icon-btn" onclick="openModal('settings')" title="Settings">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                <button class="icon-btn" onclick="openModal('settings')" title="Text Size">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><text x="2" y="18" font-size="14" font-weight="bold" fill="currentColor" stroke="none">T</text><text x="12" y="18" font-size="10" font-weight="bold" fill="currentColor" stroke="none">t</text></svg>
                 </button>
             </div>
         </header>
@@ -462,13 +464,12 @@
     <div class="modal-overlay" id="modal-settings">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">Settings</div>
+                <div class="modal-title">Text Size</div>
                 <button class="modal-close" onclick="closeModal('settings')">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             <div class="setting-group">
-                <div class="setting-title">Text Size</div>
                 <div class="setting-desc">Choose a comfortable size for your screen</div>
                 <div class="size-options">
                     <button class="size-btn" onclick="setFontSize('small')">Small</button>
@@ -520,14 +521,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Zone</label>
-                        <select id="int-zone">
-                            <option value="1">Zone 1</option>
-                            <option value="2">Zone 2</option>
-                            <option value="2A">Zone 2A</option>
-                            <option value="3">Zone 3</option>
-                            <option value="4">Zone 4</option>
-                            <option value="5">Zone 5</option>
-                        </select>
+                        <select id="int-zone"></select>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Cadence</label>
@@ -714,6 +708,7 @@
                 }
                 renderAdminIntervals();
                 renderZoneConfig();
+                updateZoneSelect();
                 showAdminPanel('ai'); // Default to AI tab
                 openModal('admin');
             } else if (pw !== null) {
@@ -732,19 +727,77 @@
         }
 
         function renderZoneConfig() {
-            document.getElementById('zone-config').innerHTML = Object.entries(zones).map(([z, r]) =>
-                `<div class="zone-row"><label>Zone ${z}</label><input type="number" id="zone-${z}-min" value="${r.min}" placeholder="Min"><input type="number" id="zone-${z}-max" value="${r.max}" placeholder="Max"></div>`
-            ).join('');
+            const zoneEntries = Object.entries(zones);
+            document.getElementById('zone-config').innerHTML = zoneEntries.map(([z, r]) =>
+                `<div class="zone-row">
+                    <input type="text" class="zone-name-input" value="${z}" data-original="${z}" onchange="renameZone('${z}', this.value)" placeholder="Name">
+                    <input type="number" id="zone-${z}-min" value="${r.min}" placeholder="Min %">
+                    <input type="number" id="zone-${z}-max" value="${r.max}" placeholder="Max %">
+                    <button class="btn-ghost btn-sm" onclick="deleteZone('${z}')" title="Delete zone">×</button>
+                </div>`
+            ).join('') + `
+                <div class="add-zone-row">
+                    <input type="text" id="new-zone-name" placeholder="Zone name (e.g. 6)" style="width: 80px;">
+                    <input type="number" id="new-zone-min" placeholder="Min %" style="width: 80px;">
+                    <input type="number" id="new-zone-max" placeholder="Max %" style="width: 80px;">
+                    <button class="btn btn-secondary btn-sm" onclick="addZone()">+ Add</button>
+                </div>`;
         }
 
         function saveZones() {
             Object.keys(zones).forEach(z => {
-                zones[z].min = parseInt(document.getElementById(`zone-${z}-min`).value) || zones[z].min;
-                zones[z].max = parseInt(document.getElementById(`zone-${z}-max`).value) || zones[z].max;
+                const minEl = document.getElementById(`zone-${z}-min`);
+                const maxEl = document.getElementById(`zone-${z}-max`);
+                if (minEl && maxEl) {
+                    zones[z].min = parseInt(minEl.value) || zones[z].min;
+                    zones[z].max = parseInt(maxEl.value) || zones[z].max;
+                }
             });
             localStorage.setItem('bhcc_zones', JSON.stringify(zones));
             alert('Zones saved');
             renderWorkoutTable();
+            renderZoneConfig();
+        }
+
+        function addZone() {
+            const name = document.getElementById('new-zone-name').value.trim().toUpperCase();
+            const min = parseInt(document.getElementById('new-zone-min').value);
+            const max = parseInt(document.getElementById('new-zone-max').value);
+            if (!name) { alert('Enter a zone name'); return; }
+            if (zones[name]) { alert('Zone already exists'); return; }
+            if (isNaN(min) || isNaN(max)) { alert('Enter min and max percentages'); return; }
+            zones[name] = { min, max };
+            localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            renderZoneConfig();
+            renderWorkoutTable();
+        }
+
+        function deleteZone(name) {
+            if (Object.keys(zones).length <= 1) { alert('Must have at least one zone'); return; }
+            if (!confirm(`Delete Zone ${name}?`)) return;
+            delete zones[name];
+            localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            renderZoneConfig();
+            renderWorkoutTable();
+        }
+
+        function renameZone(oldName, newName) {
+            newName = newName.trim().toUpperCase();
+            if (!newName || newName === oldName) {
+                renderZoneConfig();
+                return;
+            }
+            if (zones[newName]) { alert('Zone name already exists'); renderZoneConfig(); return; }
+            zones[newName] = zones[oldName];
+            delete zones[oldName];
+            localStorage.setItem('bhcc_zones', JSON.stringify(zones));
+            renderZoneConfig();
+            renderWorkoutTable();
+        }
+
+        function updateZoneSelect() {
+            const select = document.getElementById('int-zone');
+            select.innerHTML = Object.keys(zones).map(z => `<option value="${z}">Zone ${z}</option>`).join('');
         }
 
         // Admin
@@ -813,12 +866,7 @@
                     <span class="time">${start}→${formatTime(cum)}</span>
                     <input type="text" class="duration-input" value="${formatTime(int.duration)}" onchange="updateInterval(${i}, 'duration', this.value)" placeholder="2:00">
                     <select class="zone-select" onchange="updateInterval(${i}, 'zone', this.value)">
-                        <option value="1" ${int.zone==='1'?'selected':''}>Z1</option>
-                        <option value="2" ${int.zone==='2'?'selected':''}>Z2</option>
-                        <option value="2A" ${int.zone==='2A'?'selected':''}>Z2A</option>
-                        <option value="3" ${int.zone==='3'?'selected':''}>Z3</option>
-                        <option value="4" ${int.zone==='4'?'selected':''}>Z4</option>
-                        <option value="5" ${int.zone==='5'?'selected':''}>Z5</option>
+                        ${Object.keys(zones).map(z => `<option value="${z}" ${int.zone===z?'selected':''}>Z${z}</option>`).join('')}
                     </select>
                     <input type="text" class="cadence-input" value="${int.cadence}" onchange="updateInterval(${i}, 'cadence', this.value)" placeholder="85-90">
                     <input type="text" class="hr-input" value="${int.hrPercent}" onchange="updateInterval(${i}, 'hrPercent', this.value)" placeholder="65%">
