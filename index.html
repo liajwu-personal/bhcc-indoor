@@ -208,12 +208,26 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             overflow: hidden;
+            font-size: 12px;
+        }
+        .interval-preview-header {
+            display: grid;
+            grid-template-columns: 50px 55px 45px 1fr 60px 50px;
+            padding: 8px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
         }
         .interval-preview-row {
             display: grid;
-            grid-template-columns: 40px 1fr 60px 60px;
+            grid-template-columns: 50px 55px 45px 1fr 60px 50px;
             padding: 10px 12px;
-            font-size: var(--text-sm);
+            font-size: 13px;
+            font-weight: 500;
             border-bottom: 1px solid var(--border);
             align-items: center;
         }
@@ -223,15 +237,15 @@
             color: white;
             font-weight: 600;
         }
-        .interval-preview-row .row-num {
-            color: var(--text-dim);
-            font-size: 11px;
-        }
-        .interval-preview-row.current-row .row-num { color: rgba(255,255,255,0.8); }
-        .interval-preview-row .row-zone { font-weight: 600; }
-        .interval-preview-row .row-duration { text-align: right; font-variant-numeric: tabular-nums; }
-        .interval-preview-row .row-cadence { text-align: right; color: var(--text-dim); }
-        .interval-preview-row.current-row .row-cadence { color: rgba(255,255,255,0.8); }
+        .interval-preview-row span { font-variant-numeric: tabular-nums; }
+        .interval-preview-row .row-power,
+        .interval-preview-row .row-cadence,
+        .interval-preview-row .row-hr { color: var(--text-dim); }
+        .interval-preview-row.current-row .row-power,
+        .interval-preview-row.current-row .row-cadence,
+        .interval-preview-row.current-row .row-hr { color: rgba(255,255,255,0.9); }
+        .interval-preview-header span:last-child,
+        .interval-preview-row span:last-child { text-align: right; }
 
         /* Header HR button connected state */
         .icon-btn.hr-connected { color: var(--hr); }
@@ -1637,15 +1651,28 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             const endIdx = Math.min(startIdx + 3, exp.length);
             const total = exp.length;
 
-            let html = '';
+            // Header row
+            let html = `<div class="interval-preview-header">
+                <span>#</span>
+                <span>Duration</span>
+                <span>Zone</span>
+                <span>Power</span>
+                <span>Cadence</span>
+                <span>HR</span>
+            </div>`;
+
             for (let i = startIdx; i < endIdx; i++) {
                 const int = exp[i];
                 const isCurrent = i === currentIntervalIndex;
+                const pwr = userProfile?.ftp ? calcPower(int.zone, userProfile.ftp) : null;
+                const hr = userProfile?.maxhr ? calcHR(int.hrPercent, userProfile.maxhr) : '-';
                 html += `<div class="interval-preview-row ${isCurrent ? 'current-row' : ''}">
-                    <span class="row-num">${i + 1}/${total}</span>
-                    <span class="row-zone">Zone ${int.zone}</span>
-                    <span class="row-duration">${formatTime(int.duration)}</span>
+                    <span>${i + 1}/${total}</span>
+                    <span>${formatTime(int.duration)}</span>
+                    <span>Z${int.zone}</span>
+                    <span class="row-power">${pwr ? pwr + 'W' : '-'}</span>
                     <span class="row-cadence">${int.cadence}</span>
+                    <span class="row-hr">${hr}</span>
                 </div>`;
             }
             previewEl.innerHTML = html;
