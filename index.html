@@ -201,6 +201,38 @@
         .ride-ctrl-btn.next-btn:hover { background: #2563eb; }
         .ride-ctrl-btn.next-btn.disabled { background: var(--bg-elevated); border-color: var(--border); opacity: 0.5; }
 
+        /* Mini interval preview table */
+        .interval-preview {
+            margin-top: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .interval-preview-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 60px 60px;
+            padding: 10px 12px;
+            font-size: var(--text-sm);
+            border-bottom: 1px solid var(--border);
+            align-items: center;
+        }
+        .interval-preview-row:last-child { border-bottom: none; }
+        .interval-preview-row.current-row {
+            background: var(--accent);
+            color: white;
+            font-weight: 600;
+        }
+        .interval-preview-row .row-num {
+            color: var(--text-dim);
+            font-size: 11px;
+        }
+        .interval-preview-row.current-row .row-num { color: rgba(255,255,255,0.8); }
+        .interval-preview-row .row-zone { font-weight: 600; }
+        .interval-preview-row .row-duration { text-align: right; font-variant-numeric: tabular-nums; }
+        .interval-preview-row .row-cadence { text-align: right; color: var(--text-dim); }
+        .interval-preview-row.current-row .row-cadence { color: rgba(255,255,255,0.8); }
+
         /* Header HR button connected state */
         .icon-btn.hr-connected { color: var(--hr); }
 
@@ -453,6 +485,9 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 </div>
+
+                <!-- Mini interval preview -->
+                <div class="interval-preview" id="interval-preview"></div>
             </div>
         </div>
 
@@ -1485,7 +1520,15 @@ Respond ONLY with a valid JSON array, no explanation. Example:
 
             // Check browser support
             if (!navigator.bluetooth) {
-                alert('Bluetooth not supported. Try Chrome or Edge.');
+                // Detect iOS (includes iPhone, iPad, iPod)
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+                    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+                if (isIOS) {
+                    alert('Sorry, Bluetooth heart rate monitors are not supported on iOS devices (iPhone/iPad). This is an Apple limitation that affects all browsers.\n\nTo use HR monitoring, try:\n• An Android phone/tablet\n• A laptop with Chrome or Edge');
+                } else {
+                    alert('Bluetooth not supported in this browser. Try Chrome or Edge on desktop.');
+                }
                 return;
             }
 
@@ -1581,11 +1624,39 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             }
         }
 
+        function renderIntervalPreview() {
+            const exp = expandWorkout();
+            const previewEl = document.getElementById('interval-preview');
+            if (!exp.length) {
+                previewEl.innerHTML = '';
+                return;
+            }
+
+            // Show current + next 2 intervals
+            const startIdx = currentIntervalIndex;
+            const endIdx = Math.min(startIdx + 3, exp.length);
+            const total = exp.length;
+
+            let html = '';
+            for (let i = startIdx; i < endIdx; i++) {
+                const int = exp[i];
+                const isCurrent = i === currentIntervalIndex;
+                html += `<div class="interval-preview-row ${isCurrent ? 'current-row' : ''}">
+                    <span class="row-num">${i + 1}/${total}</span>
+                    <span class="row-zone">Zone ${int.zone}</span>
+                    <span class="row-duration">${formatTime(int.duration)}</span>
+                    <span class="row-cadence">${int.cadence}</span>
+                </div>`;
+            }
+            previewEl.innerHTML = html;
+        }
+
         function updateRideMode() {
             const exp = expandWorkout();
             if (!exp.length) {
                 document.getElementById('ride-time').textContent = '--:--';
                 document.getElementById('ride-zone').textContent = 'No workout';
+                document.getElementById('interval-preview').innerHTML = '';
                 return;
             }
             // Bounds check - reset to 0 if index is out of range
@@ -1638,6 +1709,8 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                 document.getElementById('ride-next').textContent = 'Finish';
                 nextBtn.classList.add('disabled');
             }
+            // Update mini interval preview
+            renderIntervalPreview();
         }
     </script>
 </body>
