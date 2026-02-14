@@ -349,8 +349,8 @@
         /* Workout profile visualization */
         .workout-profile {
             flex: 1;
-            min-height: 150px;
-            max-height: 300px;
+            min-height: 180px;
+            height: 200px;
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 12px;
@@ -363,7 +363,7 @@
         .profile-bars {
             display: flex;
             align-items: flex-end;
-            height: 100%;
+            height: 150px;
             width: 100%;
             gap: 1px;
         }
@@ -390,11 +390,12 @@
             position: absolute;
             top: 0;
             bottom: 0;
+            left: 0;
             width: 3px;
             background: var(--power);
             box-shadow: 0 0 8px var(--power);
             z-index: 10;
-            transition: left 0.5s ease;
+            transition: left 0.3s ease;
         }
 
         /* Desktop controls row */
@@ -609,7 +610,7 @@
             <div class="view-toggle">
                 <button class="view-btn active" onclick="setView('table')" id="btn-table">Table</button>
                 <button class="view-btn" onclick="setView('ride')" id="btn-ride">Ride</button>
-                <button class="view-btn" onclick="setView('display')" id="btn-display">Display</button>
+                <button class="view-btn" onclick="setView('display')" id="btn-display">Studio</button>
             </div>
 
             <div id="table-view">
@@ -1469,6 +1470,13 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             document.getElementById('play-icon').style.display = 'none';
             document.getElementById('pause-icon').style.display = 'block';
             document.getElementById('timer-btn').classList.add('playing');
+            // Also update desktop timer button
+            const desktopBtn = document.getElementById('desktop-timer-btn');
+            if (desktopBtn) {
+                desktopBtn.querySelector('.play-icon').style.display = 'none';
+                desktopBtn.querySelector('.pause-icon').style.display = 'block';
+                desktopBtn.classList.add('playing');
+            }
             if (isLeader) syncTimerState();
 
             // Only leader runs the actual countdown interval
@@ -1503,6 +1511,13 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
             document.getElementById('timer-btn').classList.remove('playing');
+            // Also update desktop timer button
+            const desktopBtn = document.getElementById('desktop-timer-btn');
+            if (desktopBtn) {
+                desktopBtn.querySelector('.play-icon').style.display = 'block';
+                desktopBtn.querySelector('.pause-icon').style.display = 'none';
+                desktopBtn.classList.remove('playing');
+            }
             // Only sync if we are the leader
             if (shouldSync && isLeader) {
                 db.collection('workouts').doc('timer').set({
@@ -1525,6 +1540,13 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             document.getElementById('play-icon').style.display = 'block';
             document.getElementById('pause-icon').style.display = 'none';
             document.getElementById('timer-btn').classList.remove('playing');
+            // Also update desktop timer button
+            const desktopBtn = document.getElementById('desktop-timer-btn');
+            if (desktopBtn) {
+                desktopBtn.querySelector('.play-icon').style.display = 'block';
+                desktopBtn.querySelector('.pause-icon').style.display = 'none';
+                desktopBtn.classList.remove('playing');
+            }
 
             // Reset to full duration
             const exp = expandWorkout();
@@ -1545,7 +1567,11 @@ Respond ONLY with a valid JSON array, no explanation. Example:
             }
         }
 
-        function updateTimerDisplay() { document.getElementById('ride-time').textContent = formatTime(remainingSeconds); }
+        function updateTimerDisplay() {
+            document.getElementById('ride-time').textContent = formatTime(remainingSeconds);
+            // Also update display mode
+            updateDesktopView();
+        }
 
         // Firebase Timer Sync
         let isLeader = false;
@@ -1706,6 +1732,13 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     document.getElementById('play-icon').style.display = 'none';
                     document.getElementById('pause-icon').style.display = 'block';
                     document.getElementById('timer-btn').classList.add('playing');
+                    // Also update desktop timer button
+                    const desktopBtn = document.getElementById('desktop-timer-btn');
+                    if (desktopBtn) {
+                        desktopBtn.querySelector('.play-icon').style.display = 'none';
+                        desktopBtn.querySelector('.pause-icon').style.display = 'block';
+                        desktopBtn.classList.add('playing');
+                    }
                     // Start follower display interval for smooth countdown between syncs
                     if (!followerDisplayInterval) {
                         let lastTick = Date.now();
@@ -1734,6 +1767,13 @@ Respond ONLY with a valid JSON array, no explanation. Example:
                     document.getElementById('play-icon').style.display = 'block';
                     document.getElementById('pause-icon').style.display = 'none';
                     document.getElementById('timer-btn').classList.remove('playing');
+                    // Also update desktop timer button
+                    const desktopBtn = document.getElementById('desktop-timer-btn');
+                    if (desktopBtn) {
+                        desktopBtn.querySelector('.play-icon').style.display = 'block';
+                        desktopBtn.querySelector('.pause-icon').style.display = 'none';
+                        desktopBtn.classList.remove('playing');
+                    }
                 }
 
                 updateRideMode();
