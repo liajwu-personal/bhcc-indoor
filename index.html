@@ -212,11 +212,12 @@
         }
         .interval-preview-header {
             display: grid;
-            grid-template-columns: 50px 55px 45px 1fr 60px 50px;
-            padding: 8px 12px;
+            grid-template-columns: 50px 65px 50px 1fr 70px 50px;
+            gap: 8px;
+            padding: 8px 14px;
             font-size: 11px;
             font-weight: 600;
-            color: var(--text-dim);
+            color: #999;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             background: var(--bg-elevated);
@@ -224,9 +225,10 @@
         }
         .interval-preview-row {
             display: grid;
-            grid-template-columns: 50px 55px 45px 1fr 60px 50px;
-            padding: 10px 12px;
-            font-size: 13px;
+            grid-template-columns: 50px 65px 50px 1fr 70px 50px;
+            gap: 8px;
+            padding: 12px 14px;
+            font-size: 14px;
             font-weight: 500;
             border-bottom: 1px solid var(--border);
             align-items: center;
@@ -240,10 +242,10 @@
         .interval-preview-row span { font-variant-numeric: tabular-nums; }
         .interval-preview-row .row-power,
         .interval-preview-row .row-cadence,
-        .interval-preview-row .row-hr { color: var(--text-dim); }
+        .interval-preview-row .row-hr { color: #aaa; }
         .interval-preview-row.current-row .row-power,
         .interval-preview-row.current-row .row-cadence,
-        .interval-preview-row.current-row .row-hr { color: rgba(255,255,255,0.9); }
+        .interval-preview-row.current-row .row-hr { color: rgba(255,255,255,0.95); }
         .interval-preview-header span:last-child,
         .interval-preview-row span:last-child { text-align: right; }
 
@@ -1101,27 +1103,28 @@ Respond ONLY with a valid JSON array, no explanation. Example:
 
             // Show Power/HR columns only if user has profile
             if (userProfile) {
-                thead.innerHTML = '<tr><th>Time</th><th>Duration</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>';
+                thead.innerHTML = '<tr><th>#</th><th>Time</th><th>Duration</th><th>Zone</th><th>Power</th><th>Cadence</th><th>HR</th></tr>';
             } else {
-                thead.innerHTML = '<tr><th>Time</th><th>Duration</th><th>Zone</th><th>Cadence</th></tr>';
+                thead.innerHTML = '<tr><th>#</th><th>Time</th><th>Duration</th><th>Zone</th><th>Cadence</th></tr>';
             }
 
-            const colCount = userProfile ? 6 : 4;
+            const colCount = userProfile ? 7 : 5;
             if (workout.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="${colCount}" class="empty-state">No workout loaded</td></tr>`;
                 return;
             }
 
             const exp = expandWorkout();
+            const total = exp.length;
             let cum = 0;
             tbody.innerHTML = exp.map((int, i) => {
                 cum += int.duration;
                 if (userProfile) {
                     const pwr = calcPower(int.zone, userProfile.ftp);
                     const hr = calcHR(int.hrPercent, userProfile.maxhr);
-                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
+                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${i+1}</td><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${pwr?pwr+'W':'—'}</td><td>${int.cadence}</td><td>${hr}</td></tr>`;
                 } else {
-                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${int.cadence}</td></tr>`;
+                    return `<tr class="${i===currentIntervalIndex?'current':''}" onclick="setCurrentInterval(${i})"><td>${i+1}</td><td>${formatTime(cum)}</td><td>${formatTime(int.duration)}</td><td>Z${int.zone}</td><td>${int.cadence}</td></tr>`;
                 }
             }).join('');
         }
