@@ -170,6 +170,7 @@
         #lead-btn { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 10px; padding: 8px 16px; font-weight: 600; }
         #lead-btn:hover { background: var(--bg-card); }
         #lead-btn.active { background: var(--success); border-color: var(--success); color: white; }
+        #studio-lead-btn.active { background: var(--success); border-color: var(--success); color: white; }
         .controls-disabled { opacity: 0.4; pointer-events: none; }
 
         #leader-status { font-size: 11px; color: var(--text-dim); margin-bottom: 16px; }
@@ -710,6 +711,7 @@
                         <div class="profile-position" id="profile-position"></div>
                     </div>
                     <div class="desktop-controls">
+                        <button class="ride-ctrl-btn" onclick="toggleLeader()" id="studio-lead-btn">Lead</button>
                         <button class="ride-ctrl-btn" onclick="toggleTimer()" id="desktop-timer-btn">
                             <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21"/></svg>
                             <svg class="pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
@@ -1616,33 +1618,50 @@ Respond ONLY with a valid JSON array, no explanation. Example:
 
         function updateLeaderUI() {
             const btn = document.getElementById('lead-btn');
+            const studioBtn = document.getElementById('studio-lead-btn');
             const status = document.getElementById('leader-status');
             const rideControls = document.querySelector('.ride-controls');
+            const desktopControls = document.querySelector('.desktop-controls');
             const nextBtn = document.getElementById('next-up-btn');
             const prevBtn = document.getElementById('prev-btn');
 
             if (isLeader) {
                 btn.classList.add('active');
                 btn.textContent = 'Leading';
+                if (studioBtn) {
+                    studioBtn.classList.add('active');
+                    studioBtn.textContent = 'Leading';
+                }
                 status.textContent = '● Leading';
                 status.style.color = 'var(--success)';
                 rideControls?.classList.remove('controls-disabled');
+                desktopControls?.classList.remove('controls-disabled');
                 nextBtn?.classList.remove('controls-disabled');
                 prevBtn?.classList.remove('controls-disabled');
             } else if (currentLeaderId) {
                 btn.classList.remove('active');
                 btn.textContent = 'Lead';
+                if (studioBtn) {
+                    studioBtn.classList.remove('active');
+                    studioBtn.textContent = 'Lead';
+                }
                 status.textContent = 'Following';
                 status.style.color = 'var(--text-dim)';
                 rideControls?.classList.add('controls-disabled');
+                desktopControls?.classList.add('controls-disabled');
                 nextBtn?.classList.add('controls-disabled');
                 prevBtn?.classList.add('controls-disabled');
             } else {
                 btn.classList.remove('active');
                 btn.textContent = 'Lead';
+                if (studioBtn) {
+                    studioBtn.classList.remove('active');
+                    studioBtn.textContent = 'Lead';
+                }
                 status.textContent = '';
                 status.style.color = 'var(--text-dim)';
                 rideControls?.classList.remove('controls-disabled');
+                desktopControls?.classList.remove('controls-disabled');
                 nextBtn?.classList.remove('controls-disabled');
                 prevBtn?.classList.remove('controls-disabled');
             }
